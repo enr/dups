@@ -38,8 +38,7 @@ c2c3cf2f0ce489606d88daa5512693a47dbf1cbf /tmp/dups/logs/refs/heads/master
 Checked 129 files and found 2 dups in 230ns
 ```
 
-Using `--quiet` option output is suppressed but exit code is 2 if duplicates are
-found or 0 otherwise.
+Using `--quiet` option output is suppressed but exit code is the number of duplicates found.
 
 ```
 $ ./bin/dups --quiet .git/
