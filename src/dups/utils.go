@@ -1,18 +1,8 @@
 package main
 
-/*
-
-Find duplicate files (same xxhash) in a directory.
-
-Usage:
-
-go run main.go ~/Pictures/
-*/
-
 import (
 	"path/filepath"
 	"time"
-	//	"github.com/dustin/go-humanize"
 )
 
 func trace(s string) (string, time.Time) {
@@ -27,7 +17,6 @@ func un(s string, startTime time.Time) {
 	endTime := time.Now()
 	//logger.Println("  END:", s, "ElapsedTime:", )
 	logger.Printf("Checked %d files and found %d dups in %s", processed, ndups, endTime.Sub(startTime))
-	//logger.Printf("Dups %d\n", ndups)
 }
 
 func normalizePath(dirpath string) (string, error) {

@@ -43,8 +43,8 @@ for pkg_dir in "${src_dirs[@]}"; do
 	go test -cover ./...
 done
 
-for dir in $(find "$SRC_DIR" -mindepth 1 -maxdepth 1 -type d); do
-	echo " - Process $dir"
-	bname=$(basename "$dir")
-	echo $bname
-done
+# for dir in $(find "$SRC_DIR" -mindepth 1 -maxdepth 1 -type d); do
+# 	echo " - Process $dir"
+# 	bname=$(basename "$dir")
+# 	echo $bname
+# done

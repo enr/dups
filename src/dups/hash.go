@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	//xxhash "github.com/OneOfOne/xxhash/native"
 )
 
 // Size of a SHA1 checksum in bytes.

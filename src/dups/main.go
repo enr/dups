@@ -1,22 +1,5 @@
 package main
 
-/*
-
-Find duplicate files (same xxhash) in a directory.
-
-Usage:
-
-go run main.go ~/Pictures/
-
-TODO:
-
-* aggiungere option --exclude=.git/,/node_modules/
-  dove fileID, err := filepath.Rel(source, fpath) aggiungere il ToSlash per confronto
-  e dove lang.SliceContainsString(excludes, fileID) usare strings.Contains()
-* riprovare benchmark in golang/dups_bench perche' almeno su linux meglio sha1 che l'altro hash usato
-
-*/
-
 import (
 	"flag"
 	"fmt"
@@ -81,8 +64,6 @@ func main() {
 		fmt.Printf("error %v\n", err)
 		os.Exit(1)
 	}
-	//printFinalReport(processed, ndups)
-
 }
 
 func readDirectory(dirpath string) (map[string][]string, error) {
