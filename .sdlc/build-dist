@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -e
+
+TOOL_SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$TOOL_SOURCE" ] ; do TOOL_SOURCE="$(readlink "$TOOL_SOURCE")"; done
+SDLC_DIR="$( cd -P "$( dirname "$TOOL_SOURCE" )" && pwd )"
+PRJ_HOME="$( cd -P "$( dirname "$SDLC_DIR" )" && pwd )"
+
+source "${SDLC_DIR}/config"
+DIST_DIR="${PRJ_HOME}/${DIST_DIR}"
+CMDS_DIR="${PRJ_HOME}/cmd"
+
+buildtime=$(TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ')
+git_hash="$(git rev-parse HEAD)"
+git_dirty="$(test -n "`git status --porcelain`" && echo "+CHANGES" || true)"
+git_commit="${git_hash}${git_dirty}"
+echo "building ${GH_REPO}"
+echo "version : ${APP_VERSION}"
+echo "git : ${git_commit}"
+echo "build time : ${buildtime}"
+
+[[ -z "$DIST_DIR" ]] && {
+  echo "no dist dir set"
+  exit 1
+}
+
+[[ -d "${PRJ_HOME}/bin" ]] && rm -r "${PRJ_HOME}/bin"
+[[ -d "$DIST_DIR" ]] && rm -r "$DIST_DIR"
+mkdir -p "$DIST_DIR"
+
+platforms="windows/amd64 linux/amd64 darwin/amd64"
+
+for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
+  app_name=$(basename "$dir")
+  echo " =====     Process ${app_name} ${dir}     ====="
+  for platform in $platforms; do
+    cd "$PRJ_HOME"
+    target_goos=$(echo $platform | cut -d/ -f1)
+    target_goarch=$(echo $platform | cut -d/ -f2)
+    echo "building for ${target_goos} ${target_goarch}"
+    platform_dist_basename="${GH_REPO}-${APP_VERSION}_${target_goos}_${target_goarch}"
+    platform_dist_dir="${DIST_DIR}/${platform_dist_basename}"
+    mkdir -p "$platform_dist_dir"
+    ext=''
+    [[ "windows" = "$target_goos" ]] && ext='.exe'
+    built="${PRJ_HOME}/bin/${app_name}-${target_goos}-${target_goarch}${ext}"
+    GOOS="$target_goos" GOARCH="$target_goarch" go build -ldflags "-s \
+    -X github.com/${GH_OWNER}/${GH_REPO}/lib/core.Version=${APP_VERSION} \
+    -X github.com/${GH_OWNER}/${GH_REPO}/lib/core.BuildTime=${buildtime} \
+    -X github.com/${GH_OWNER}/${GH_REPO}/lib/core.GitCommit=${git_commit}" \
+    -o "$built" \
+    "github.com/${GH_OWNER}/${GH_REPO}/cmd/${app_name}"
+    [[ -e "$built" ]] || {
+      echo "expected file not found: ${built}"
+      exit 1
+    }
+    mv "${PRJ_HOME}/bin/${app_name}-${target_goos}-${target_goarch}${ext}" "${platform_dist_dir}/${app_name}${ext}"
+    # cd "$DIST_DIR"
+    # zip -r "${platform_dist_basename}.zip" "$platform_dist_basename"
+    # rm -r "$platform_dist_basename"
+  done
+done
+
+cd "$DIST_DIR"
+for dir in $(find "$DIST_DIR" -mindepth 1 -maxdepth 1 -type d); do
+  dist_folder=$(basename "$dir")
+  echo " =====     Create dist ${dist_folder} ${dir}     ====="
+  zip -r "${dist_folder}.zip" "$dist_folder"
+  rm -r "$dist_folder"
+done

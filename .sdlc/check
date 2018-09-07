@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+set -e
+
+TOOL_SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$TOOL_SOURCE" ] ; do TOOL_SOURCE="$(readlink "$TOOL_SOURCE")"; done
+SDLC_DIR="$( cd -P "$( dirname "$TOOL_SOURCE" )" && pwd )"
+PRJ_HOME="$( cd -P "$( dirname "$SDLC_DIR" )" && pwd )"
+
+source "${SDLC_DIR}/config"
+app_name="$GH_REPO"
+
+SRC_DIR="${PRJ_HOME}/src"
+CMDS_DIR="${PRJ_HOME}/cmd"
+BIN_DIR="${PRJ_HOME}/bin"
+
+[[ -d "${PRJ_HOME}/bin" ]] && rm -r "${PRJ_HOME}/bin"
+
+hash golint 2>/dev/null || {
+  go get -u github.com/golang/lint/golint
+}
+
+hash goimports 2>/dev/null || {
+  go get golang.org/x/tools/cmd/goimports
+}
+
+cd "${PRJ_HOME}"
+
+for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
+  app_name=$(basename "$dir")
+  echo "===== Process ${app_name} [${dir}]"
+  cd "$dir"
+  echo "----- golint"
+  diff <(golint ./...) <(printf "")
+  echo "----- go fmt"
+  go fmt ./...
+  echo "----- go vet"
+  go vet ./...
+  echo "----- goimports"
+  goimports -w .
+  diff <(goimports -d .) <(printf "")
+  cd "$PRJ_HOME"
+  echo "----- go build"
+  # we need binaries for some e2e test
+  go build -o "${BIN_DIR}/${app_name}" "github.com/${GH_OWNER}/${GH_REPO}/cmd/${app_name}"
+  cd "$dir"
+  echo "----- go test -cover ./..."
+  go test -cover ./...
+done

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -e
+
+TOOL_SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$TOOL_SOURCE" ] ; do TOOL_SOURCE="$(readlink "$TOOL_SOURCE")"; done
+SDLC_DIR="$( cd -P "$( dirname "$TOOL_SOURCE" )" && pwd )"
+PRJ_HOME="$( cd -P "$( dirname "$SDLC_DIR" )" && pwd )"
+
+source "${SDLC_DIR}/config"
+
+CMDS_DIR="${PRJ_HOME}/cmd"
+BIN_DIR="${PRJ_HOME}/bin"
+[[ -d "$BIN_DIR" ]] && rm -r "$BIN_DIR"
+mkdir "$BIN_DIR"
+
+cd "${PRJ_HOME}"
+
+buildtime=$(TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ')
+git_hash="$(git rev-parse HEAD)"
+git_dirty="$(test -n "`git status --porcelain`" && echo "+CHANGES" || true)"
+git_commit="${git_hash}${git_dirty}"
+echo "building ${GH_REPO}"
+echo "version : ${APP_VERSION}"
+echo "git : ${git_commit}"
+echo "build time : ${buildtime}"
+
+command -v dep >/dev/null || {
+  echo "dep not found"
+  exit 1
+}
+echo 'Running dep ensure'
+dep ensure -v
+
+for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
+  app_name=$(basename "$dir")
+  echo " =====     Process ${app_name} ${dir}     ====="
+  go build -ldflags "-s \
+  -X github.com/${GH_OWNER}/${GH_REPO}/lib/core.Version=${APP_VERSION} \
+  -X github.com/${GH_OWNER}/${GH_REPO}/lib/core.BuildTime=${buildtime} \
+  -X github.com/${GH_OWNER}/${GH_REPO}/lib/core.GitCommit=${git_commit}" \
+  -o "${BIN_DIR}/${app_name}" \
+  "github.com/${GH_OWNER}/${GH_REPO}/cmd/${app_name}"
+done

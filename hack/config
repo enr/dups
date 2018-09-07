@@ -1,5 +1,0 @@
-GH_OWNER='enr'
-GH_REPO='dups'
-DIST_DIR='dist'
-
-APP_VERSION='0.2'
