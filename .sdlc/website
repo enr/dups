@@ -19,10 +19,6 @@ WEBSITE_DIR="${PRJ_HOME}/build/website"
 [[ -e "$WEBSITE_DIR" ]] && rm -rf "$WEBSITE_DIR"
 mkdir -p "$WEBSITE_DIR"
 
-REPO_HOST='github.com'
-REPO_OWNER='enr'
-REPO_NAME
-
 echo "<html><head></head><body>
 <h1>${REPO_NAME} ${APP_VERSION}</h2>
 <p>${REPO_NAME} ${APP_VERSION} " >> "${WEBSITE_DIR}/index.html"
