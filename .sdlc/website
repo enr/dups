@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -e
+
+TOOL_SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$TOOL_SOURCE" ] ; do TOOL_SOURCE="$(readlink "$TOOL_SOURCE")"; done
+SDLC_DIR="$( cd -P "$( dirname "$TOOL_SOURCE" )" && pwd )"
+PRJ_HOME="$( cd -P "$( dirname "$SDLC_DIR" )" && pwd )"
+
+source "${SDLC_DIR}/config"
+
+[[ -z "$GH_TOKEN" ]] && {
+    echo "Missing GH_TOKEN"
+    exit 1
+}
+
+WEBSITE_DIR="${PRJ_HOME}/build/website"
+
+[[ -e "$WEBSITE_DIR" ]] && rm -rf "$WEBSITE_DIR"
+mkdir -p "$WEBSITE_DIR"
+
+REPO_HOST='github.com'
+REPO_OWNER='enr'
+REPO_NAME
+
+echo "<html><head></head><body>
+<h1>${REPO_NAME} ${APP_VERSION}</h2>
+<p>${REPO_NAME} ${APP_VERSION} " >> "${WEBSITE_DIR}/index.html"
+date >> "${WEBSITE_DIR}/index.html"
+echo -n '<p><a href="https://github.com/' >>  "${WEBSITE_DIR}/index.html"
+echo -n "${REPO_OWNER}/${REPO_NAME}" >>  "${WEBSITE_DIR}/index.html"
+echo '/releases/latest">Latest release</a>' >> "${WEBSITE_DIR}/index.html"
+echo '</body>
+</html>' >> "${WEBSITE_DIR}/index.html"

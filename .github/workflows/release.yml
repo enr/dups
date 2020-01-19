@@ -1,0 +1,28 @@
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Create Release
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    container: 'golang:1.13'
+    steps:
+    - name: Prepare container
+      run: |
+        apt-get update -y
+        apt-get -y install zip
+    - name: Checkout code
+      uses: actions/checkout@v1
+    - name: Create release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo Start release ${{ github.ref }}
+        .sdlc/gh-release

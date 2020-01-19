@@ -20,17 +20,11 @@ git_dirty=$(git status --porcelain)
   exit 1
 }
 
-# https://github.com/tcnksm/ghr/releases/download/v0.5.4/ghr_v0.5.4_linux_amd64.zip
-command -v ghr >/dev/null || {
-  echo "ghr not found"
-  exit 1
-}
-
-[[ -z "$GH_OWNER" ]] && {
+[[ -z "$REPO_OWNER" ]] && {
   echo "no gh owner"
   exit 1
 }
-[[ -z "$GH_REPO" ]] && {
+[[ -z "$REPO_NAME" ]] && {
   echo "no gh repo"
   exit 1
 }
@@ -40,17 +34,33 @@ if [ -z "$APP_VERSION" ]; then
   exit 1
 fi
 
-RELEASE_VERSION="v$APP_VERSION"
-git tag -a "${RELEASE_VERSION}" -m "release version ${RELEASE_VERSION}"
-git push origin "${RELEASE_VERSION}"
+ghr_exe='ghr'
+command -v "$ghr_exe" >/dev/null || {
+  bin_dir=$(mktemp -d)
+  echo "Installing ghr in ${bin_dir}"
+  ghr_version='0.13.0'
+  ghr_url="https://github.com/tcnksm/ghr/releases/download/v${ghr_version}/ghr_v${ghr_version}_linux_amd64.tar.gz"
+  cd /tmp
+  curl -fSL -o ghr.tar.gz "$ghr_url"
+  tar -xvzf ghr.tar.gz
+  ghr_exe="${bin_dir}/ghr"
+  mv "ghr_v${ghr_version}_linux_amd64/ghr" "${ghr_exe}"
+  chmod +x "${ghr_exe}"
+  cd "${PRJ_HOME}"
+}
 
-if [ "$1" = "--prod" ]; then
+RELEASE_VERSION="v$APP_VERSION"
+
+prerelease_marker=$(echo "$APP_VERSION" | cut --delimiter '-' --only-delimited --fields 2)
+echo "Prerelease marker '${prerelease_marker}'"
+
+if [ -z "$prerelease_marker" ]; then
   PRERELEASE=''
 else
   PRERELEASE='--prerelease'
 fi
 
-echo "Release $PRJ_HOME version $RELEASE_VERSION $PRERELEASE"
+echo "Release ${PRJ_HOME} version ${RELEASE_VERSION} ${PRERELEASE}"
 
 "${SDLC_DIR}/build-dist"
 
@@ -59,7 +69,7 @@ echo "Release $PRJ_HOME version $RELEASE_VERSION $PRERELEASE"
   exit 1
 }
 
-#ghr -t "$GH_TOKEN" -u "$GH_OWNER" -r "$GH_REPO" "$PRERELEASE" "$RELEASE_VERSION" "$DIST_DIR"
-GHR_COMMAND="ghr -t ${GH_TOKEN} -u ${GH_OWNER} -r ${GH_REPO} ${PRERELEASE} ${RELEASE_VERSION} ${DIST_DIR}"
+GHR_COMMAND="${ghr_exe} -t ${GH_TOKEN} -u ${REPO_OWNER} -r ${REPO_NAME} ${PRERELEASE} ${RELEASE_VERSION} ${DIST_DIR}"
+echo 'Execute ghr command:'
 echo "$GHR_COMMAND"
 sh -c "$GHR_COMMAND"

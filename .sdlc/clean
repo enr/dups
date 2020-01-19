@@ -7,7 +7,11 @@ while [ -h "$TOOL_SOURCE" ] ; do TOOL_SOURCE="$(readlink "$TOOL_SOURCE")"; done
 SDLC_DIR="$( cd -P "$( dirname "$TOOL_SOURCE" )" && pwd )"
 PRJ_HOME="$( cd -P "$( dirname "$SDLC_DIR" )" && pwd )"
 
-cd "$PRJ_HOME"
+BIN_DIR="${PRJ_HOME}/bin"
+[[ -d "$BIN_DIR" ]] && rm -r "$BIN_DIR"
 
-go mod tidy
-go mod vendor
+BUILD_DIR="${PRJ_HOME}/build"
+[[ -d "$BUILD_DIR" ]] && rm -r "$BUILD_DIR"
+
+DIST_DIR="${PRJ_HOME}/dist"
+[[ -d "$DIST_DIR" ]] && rm -r "$DIST_DIR"
