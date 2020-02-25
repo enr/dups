@@ -81,7 +81,6 @@ func humanizeDuration(duration time.Duration) string {
 	}
 
 	parts := []string{}
-
 	for _, chunk := range chunks {
 		switch chunk.amount {
 		case 0:
@@ -93,5 +92,9 @@ func humanizeDuration(duration time.Duration) string {
 		}
 	}
 
-	return strings.Join(parts, " ")
+	s := strings.TrimSpace(strings.Join(parts, " "))
+	if s == "" {
+		return "no time"
+	}
+	return s
 }
