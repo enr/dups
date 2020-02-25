@@ -16,6 +16,7 @@ source "${SDLC_DIR}/config"
 
 WEBSITE_DIR="${PRJ_HOME}/build/website"
 
+export CI_BUILD_ID="$GITHUB_SHA"
 sh -c "${SDLC_DIR}/website"
 
 echo "Publishing GH pages"

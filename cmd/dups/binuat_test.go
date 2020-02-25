@@ -7,7 +7,7 @@ import (
 	"github.com/enr/runcmd"
 )
 
-type CommandExecution struct {
+type commandExecution struct {
 	Command  *runcmd.Command
 	Success  bool
 	ExitCode int
@@ -15,7 +15,7 @@ type CommandExecution struct {
 	Stderr   string
 }
 
-func VerifyExecution(t *testing.T, execution CommandExecution) {
+func verifyExecution(t *testing.T, execution commandExecution) {
 	command := execution.Command
 	res := command.Run()
 	if res.Success() != execution.Success {
@@ -30,9 +30,9 @@ func VerifyExecution(t *testing.T, execution CommandExecution) {
 	assertStringContains(t, res.Stderr().String(), execution.Stderr)
 }
 
-func VerifyExecutions(t *testing.T, executions []CommandExecution) {
+func verifyExecutions(t *testing.T, executions []commandExecution) {
 	for _, command := range executions {
-		VerifyExecution(t, command)
+		verifyExecution(t, command)
 	}
 }
 

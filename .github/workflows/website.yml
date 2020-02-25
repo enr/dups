@@ -8,15 +8,16 @@ name: Create Website
 
 jobs:
   build:
-    strategy:
-      matrix:
-        platform: [ubuntu-latest]
-    runs-on: ${{ matrix.platform }}
-    container: 'golang:1.13'
+    # strategy:
+    #   matrix:
+    #     platform: [ubuntu-latest]
+    runs-on: ubuntu-latest
+    container: 'asciidoctor/docker-asciidoctor'
     steps:
     - name: Prepare container
       run: |
         echo Preparing container
+        apk --update add git
     - name: Checkout code
       uses: actions/checkout@v1
     - name: Create website

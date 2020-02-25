@@ -6,7 +6,7 @@ import (
 	"github.com/enr/runcmd"
 )
 
-var executions = []CommandExecution{
+var executions = []commandExecution{
 	{
 		Command: &runcmd.Command{
 			Exe:  "../../bin/dups",
@@ -36,5 +36,5 @@ var executions = []CommandExecution{
 }
 
 func TestCommandExecution(t *testing.T) {
-	VerifyExecutions(t, executions)
+	verifyExecutions(t, executions)
 }

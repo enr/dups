@@ -26,8 +26,8 @@ BIN_DIR="${PRJ_HOME}/bin"
 
 # Ensure GOPATH is on PATH. (Needed from Go tools).
 # If GOPATH is defined assume it is on $PATH
-echo "Environment GOPATH=${GOPATH}"
-[[ -z "$GOPATH" ]] || {
+echo "Environment GOPATH='${GOPATH}'"
+[[ -z "$GOPATH" ]] && {
   # GOPATH undefined
   default_gopath=$(go env GOPATH)
   echo "No GOPATH from environment, using 'go env' ${default_gopath}"
@@ -37,20 +37,20 @@ echo "Environment GOPATH=${GOPATH}"
 }
 echo "Environment PATH=${PATH}"
 [[ "$PATH" =~ (^|:)"${GOPATH}/bin"(|/)(:|$) ]] || {
-  echo "Adding ${GOPATH}/bin to PATH"  
+  echo "Adding ${GOPATH}/bin to PATH"
   export PATH="${GOPATH}/bin:${PATH}"
 }
 
 hash golint 2>/dev/null || {
-  go get -u github.com/golang/lint/golint
+  go get -u golang.org/x/lint/golint
 }
 
 hash goimports 2>/dev/null || {
-  go get golang.org/x/tools/cmd/goimports
+  go get -u golang.org/x/tools/cmd/goimports
 }
 
 hash gocyclo 2>/dev/null || {
-  go get github.com/fzipp/gocyclo
+  go get -u github.com/fzipp/gocyclo
 }
 
 cd "${PRJ_HOME}"
@@ -70,14 +70,12 @@ for dir in $(find "$LIB_DIR" -mindepth 1 -maxdepth 1 -type d); do
   diff <(goimports -d .) <(printf "")
   echo "--- gocyclo"
   diff <(gocyclo -over 10 .) <(printf "")
-  cd "$PRJ_HOME"
-  echo "--- go build"
+  # cd "$PRJ_HOME"
+  # echo "--- go build"
   cd "$dir"
   echo "--- go test -cover ./..."
-  go test -cover ./...
+  go test -mod vendor -cover ./...
 done
-
-cd "${PRJ_HOME}"
 
 for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
   app_name=$(basename "$dir")
@@ -94,11 +92,11 @@ for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
   diff <(goimports -d .) <(printf "")
   echo "--- gocyclo"
   diff <(gocyclo -over 15 .) <(printf "")
-  cd "$PRJ_HOME"
+  cd "${PRJ_HOME}"
   echo "--- go build"
   # we need binaries for some e2e test
-  go build -o "${BIN_DIR}/${app_name}" "${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/cmd/${app_name}"
+  go build -mod vendor -o "${BIN_DIR}/${app_name}" "${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/cmd/${app_name}"
   cd "$dir"
   echo "--- go test -cover ./..."
-  go test -cover ./...
+  go test -mod vendor -cover ./...
 done

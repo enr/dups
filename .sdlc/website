@@ -2,29 +2,44 @@
 
 set -e
 
-TOOL_SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$TOOL_SOURCE" ] ; do TOOL_SOURCE="$(readlink "$TOOL_SOURCE")"; done
-SDLC_DIR="$( cd -P "$( dirname "$TOOL_SOURCE" )" && pwd )"
-PRJ_HOME="$( cd -P "$( dirname "$SDLC_DIR" )" && pwd )"
+tool_source="${BASH_SOURCE[0]}"
+while [ -h "$tool_source" ] ; do tool_source="$(readlink "$tool_source")"; done
+project_scripts_dir="$( cd -P "$( dirname "$tool_source" )" && pwd )"
+project_home="$( cd -P "$( dirname "$project_scripts_dir" )" && pwd )"
 
-source "${SDLC_DIR}/config"
+source "${project_scripts_dir}/config"
 
 [[ -z "$GH_TOKEN" ]] && {
     echo "Missing GH_TOKEN"
     exit 1
 }
+docs_dir="${project_home}/docs"
+cd "$docs_dir"
 
-WEBSITE_DIR="${PRJ_HOME}/build/website"
+website_build_dir="${project_home}/build/website"
+mkdir -p "$website_build_dir"
 
-[[ -e "$WEBSITE_DIR" ]] && rm -rf "$WEBSITE_DIR"
-mkdir -p "$WEBSITE_DIR"
+cp -r "$docs_dir" /documents
 
-echo "<html><head></head><body>
-<h1>${REPO_NAME} ${APP_VERSION}</h2>
-<p>${REPO_NAME} ${APP_VERSION} " >> "${WEBSITE_DIR}/index.html"
-date >> "${WEBSITE_DIR}/index.html"
-echo -n '<p><a href="https://github.com/' >>  "${WEBSITE_DIR}/index.html"
-echo -n "${REPO_OWNER}/${REPO_NAME}" >>  "${WEBSITE_DIR}/index.html"
-echo '/releases/latest">Latest release</a>' >> "${WEBSITE_DIR}/index.html"
-echo '</body>
-</html>' >> "${WEBSITE_DIR}/index.html"
+# Asciidoctor attributes
+ci_ns="${REPO_OWNER}/${REPO_NAME}"
+ci_build_id="$CI_BUILD_ID"
+project_authors="${REPO_NAME} contributors"
+echo "Using attributes ci-ns=${ci_ns} ci-build-id=${ci_build_id} project-authors=${project_authors}"
+
+asciidoctor --doctype book \
+            --attribute "project-version=${APP_VERSION}" \
+            --attribute "project-authors=${project_authors}" \
+            --attribute "ci-ns=${ci_ns}" \
+            --attribute "ci-build-id=${ci_build_id}" \
+            --destination-dir "$website_build_dir" \
+            index.adoc
+
+asciidoctor-pdf --doctype book \
+                --attribute "project-version=${APP_VERSION}" \
+                --attribute "project-authors=${project_authors}" \
+                --attribute "ci-ns=${ci_ns}" \
+                --attribute "ci-build-id=${ci_build_id}" \
+                --destination-dir "${website_build_dir}/pdf" \
+                --out-file="${REPO_NAME}_manual.pdf" \
+                index.adoc

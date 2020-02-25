@@ -42,3 +42,5 @@ for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
   -o "${BIN_DIR}/${app_name}" \
   "${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/cmd/${app_name}"
 done
+
+echo "${TOOL_SOURCE} done. Created ${BIN_DIR}/${app_name}"

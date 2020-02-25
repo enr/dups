@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"sync"
+	"syscall"
+	"time"
 
 	"github.com/enr/dups/lib/core"
 	"github.com/enr/go-commons/lang"
@@ -13,26 +17,46 @@ import (
 )
 
 var (
-	processed = 0
-	ndups     = 0
-	logger    = log.New(os.Stdout, "", 0)
-	showDups  = true
+	processed  = 0
+	ndups      = 0
+	duplicates = make(map[string][]string)
+	logger     = log.New(os.Stdout, "", 0)
+	showDups   = true
 
 	versionTemplate = `dups %s
 Revision: %s
 Build date: %s
 `
-	appVersion string
-	version    bool
-	help       bool
-	quiet      bool
-	names      bool
-	fullPath   bool
+	appVersion    string
+	baseDirectory string
+	version       bool
+	help          bool
+	quiet         bool
+	names         bool
+	fullPath      bool
+
+	startTime time.Time
 )
 
+type file struct {
+	id   string
+	path string
+}
+
 func main() {
+
+	go func() {
+		signalChan := make(chan os.Signal, 1)
+		signal.Notify(signalChan, os.Interrupt, syscall.SIGKILL, syscall.SIGHUP)
+		defer close(signalChan)
+
+		<-signalChan
+		logger.Println("Shutting down the program...")
+		os.Exit(0)
+	}()
+
 	defer func() {
-		un(trace("dups"))
+		trace()
 		os.Exit(ndups)
 	}()
 
@@ -54,13 +78,14 @@ func main() {
 		fmt.Printf(appVersion)
 		os.Exit(0)
 	}
+	startTime = time.Now()
 	args := flag.Args()
 	if len(args) < 1 {
 		fmt.Println("error missing path")
 		os.Exit(1)
 	}
-	dir := args[0]
-	_, err := readDirectory(dir)
+	baseDirectory = args[0]
+	_, err := readDirectory(baseDirectory)
 	if err != nil {
 		fmt.Printf("error %v\n", err)
 		os.Exit(1)
@@ -72,7 +97,7 @@ func readDirectory(dirpath string) (map[string][]string, error) {
 }
 
 func readDirectoryExcluding(dirpath string, excludes []string) (map[string][]string, error) {
-	duplicates := make(map[string][]string)
+
 	source, err := normalizePath(dirpath)
 	if err != nil {
 		return duplicates, err
@@ -89,6 +114,13 @@ func readDirectoryExcluding(dirpath string, excludes []string) (map[string][]str
 	if !quiet && !names {
 		logger.Printf("Looking for duplicates in %s", source)
 	}
+
+	exec := &Executor{
+		mutex:   new(sync.Mutex),
+		wg:      new(sync.WaitGroup),
+		Results: make(map[string][]string),
+	}
+
 	err = filepath.Walk(source, func(fpath string, f os.FileInfo, err error) error {
 		if !files.IsRegular(fpath) {
 			return nil
@@ -101,24 +133,35 @@ func readDirectoryExcluding(dirpath string, excludes []string) (map[string][]str
 			return nil
 		}
 		fullPath, err := normalizePath(fpath)
+		// normalizePath(path.Join(baseDirectory, fpath))
 		if err != nil {
 			return err
 		}
-		checksum, err := hash(fullPath)
-		if err != nil {
-			return err
+
+		fil := file{
+			id:   fileID,
+			path: fullPath,
 		}
-		processed = processed + 1
-		dups, ok := duplicates[checksum]
-		dups = append(dups, fileID)
-		if ok {
-			ndups = ndups + 1
-			if !quiet {
-				printDups(checksum, dups)
-			}
-		}
-		duplicates[checksum] = dups
+
+		exec.wg.Add(1)
+		go exec.SaveFileHash(fil)
+
+		// checksum, err := hash(fullPath)
+		// if err != nil {
+		// 	return err
+		// }
+		// processed = processed + 1
+		// dups, ok := duplicates[checksum]
+		// dups = append(dups, fileID)
+		// if ok {
+		// 	ndups = ndups + 1
+		// 	if !quiet {
+		// 		printDups(checksum, dups)
+		// 	}
+		// }
+		// duplicates[checksum] = dups
 		return nil
 	})
+	exec.wg.Wait()
 	return duplicates, err
 }
