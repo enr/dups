@@ -129,6 +129,7 @@ func readDirectoryExcluding(dirpath string, excludes []string) (map[string][]str
 		if err != nil {
 			return err
 		}
+		fileID = filepath.ToSlash(fileID)
 		if lang.SliceContainsString(excludes, fileID) {
 			return nil
 		}
