@@ -9,16 +9,14 @@ import (
 	"sync"
 )
 
-// Executor ...
-type Executor struct {
+type hashes struct {
 	mutex *sync.Mutex
 	wg    *sync.WaitGroup
 
-	Results map[string][]string
+	registry map[string][]string
 }
 
-// SaveFileHash Collect all files and save their hashes to the mapping
-func (e *Executor) SaveFileHash(f file) {
+func (e *hashes) save(f file) {
 	e.mutex.Lock()
 	defer e.mutex.Unlock()
 	defer e.wg.Done()
@@ -29,7 +27,7 @@ func (e *Executor) SaveFileHash(f file) {
 		log.Fatal(err)
 	}
 
-	dups, ok := e.Results[h]
+	dups, ok := e.registry[h]
 	var first string
 	if len(dups) == 1 {
 		first = dups[0]
@@ -40,14 +38,14 @@ func (e *Executor) SaveFileHash(f file) {
 		if !quiet {
 			if first != "" {
 				ndups = ndups + 1
-				printDups2(h, first)
+				printFirstDup(h, first)
 			}
 			printDups(h, f)
 		}
 	}
 	duplicates[h] = dups
 
-	e.Results[h] = append(e.Results[h], f.id)
+	e.registry[h] = append(e.registry[h], f.id)
 }
 
 func hash(fullpath string) (string, error) {

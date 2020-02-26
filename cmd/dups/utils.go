@@ -14,7 +14,6 @@ func trace() {
 		return
 	}
 	endTime := time.Now()
-	//logger.Println("  END:", s, "ElapsedTime:", )
 	logger.Printf("Checked %d files and found %d dups in %s", processed, ndups, humanizeDuration(endTime.Sub(startTime)))
 }
 
@@ -27,7 +26,7 @@ func normalizePath(dirpath string) (string, error) {
 	return p, nil
 }
 
-func printDups2(checksum string, fp string) {
+func printFirstDup(checksum string, fp string) {
 	if !showDups {
 		return
 	}

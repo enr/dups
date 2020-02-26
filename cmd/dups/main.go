@@ -115,10 +115,10 @@ func readDirectoryExcluding(dirpath string, excludes []string) (map[string][]str
 		logger.Printf("Looking for duplicates in %s", source)
 	}
 
-	exec := &Executor{
-		mutex:   new(sync.Mutex),
-		wg:      new(sync.WaitGroup),
-		Results: make(map[string][]string),
+	h := &hashes{
+		mutex:    new(sync.Mutex),
+		wg:       new(sync.WaitGroup),
+		registry: make(map[string][]string),
 	}
 
 	err = filepath.Walk(source, func(fpath string, f os.FileInfo, err error) error {
@@ -134,35 +134,17 @@ func readDirectoryExcluding(dirpath string, excludes []string) (map[string][]str
 			return nil
 		}
 		fullPath, err := normalizePath(fpath)
-		// normalizePath(path.Join(baseDirectory, fpath))
 		if err != nil {
 			return err
 		}
-
 		fil := file{
 			id:   fileID,
 			path: fullPath,
 		}
-
-		exec.wg.Add(1)
-		go exec.SaveFileHash(fil)
-
-		// checksum, err := hash(fullPath)
-		// if err != nil {
-		// 	return err
-		// }
-		// processed = processed + 1
-		// dups, ok := duplicates[checksum]
-		// dups = append(dups, fileID)
-		// if ok {
-		// 	ndups = ndups + 1
-		// 	if !quiet {
-		// 		printDups(checksum, dups)
-		// 	}
-		// }
-		// duplicates[checksum] = dups
+		h.wg.Add(1)
+		go h.save(fil)
 		return nil
 	})
-	exec.wg.Wait()
+	h.wg.Wait()
 	return duplicates, err
 }
