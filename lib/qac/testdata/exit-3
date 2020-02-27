@@ -1,0 +1,6 @@
+
+echo "stdout exit-3"
+
+echo 'stderr exit-3' >&2
+
+exit 3

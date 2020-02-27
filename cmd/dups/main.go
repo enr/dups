@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/enr/dups/lib/core"
-	"github.com/enr/go-commons/lang"
 	"github.com/enr/go-files/files"
 )
 
@@ -20,13 +19,15 @@ var (
 	processed  = 0
 	ndups      = 0
 	duplicates = make(map[string][]string)
+	startTime  time.Time
+	messages   = make(chan string)
 	logger     = log.New(os.Stdout, "", 0)
-	showDups   = true
 
 	versionTemplate = `dups %s
 Revision: %s
 Build date: %s
 `
+	showDups      = true
 	appVersion    string
 	baseDirectory string
 	version       bool
@@ -34,8 +35,7 @@ Build date: %s
 	quiet         bool
 	names         bool
 	fullPath      bool
-
-	startTime time.Time
+	excludes      []string
 )
 
 type file struct {
@@ -51,7 +51,7 @@ func main() {
 		defer close(signalChan)
 
 		<-signalChan
-		logger.Println("Shutting down the program...")
+		logger.Printf("\nShutting down the program. At the moment: checked %d files and found %d dups\n", processed, ndups)
 		os.Exit(0)
 	}()
 
@@ -59,6 +59,15 @@ func main() {
 		trace()
 		os.Exit(ndups)
 	}()
+
+	h := &hashes{
+		mutex: new(sync.Mutex),
+		wg:    new(sync.WaitGroup),
+	}
+
+	go func(*hashes) {
+		processProbableDuplicate(h)
+	}(h)
 
 	flag.BoolVar(&version, "version", false, "show version")
 	flag.BoolVar(&quiet, "quiet", false, "no output, exit code the number of dups")
@@ -84,67 +93,58 @@ func main() {
 		fmt.Println("error missing path")
 		os.Exit(1)
 	}
-	baseDirectory = args[0]
-	_, err := readDirectory(baseDirectory)
+	_, err := readDirectory(args[0])
 	if err != nil {
 		fmt.Printf("error %v\n", err)
 		os.Exit(1)
 	}
+	h.wg.Wait()
 }
 
-func readDirectory(dirpath string) (map[string][]string, error) {
-	return readDirectoryExcluding(dirpath, []string{})
+func readDirectory(dirpath string) (map[int64][]string, error) {
+	return readDirectoryExcluding(dirpath, excludes)
 }
 
-func readDirectoryExcluding(dirpath string, excludes []string) (map[string][]string, error) {
-
+func readDirectoryExcluding(dirpath string, excludes []string) (map[int64][]string, error) {
+	sizemap := make(map[int64][]string)
 	source, err := normalizePath(dirpath)
 	if err != nil {
-		return duplicates, err
+		return sizemap, err
 	}
 	if files.IsSymlink(source) {
 		source, err = os.Readlink(source)
 		if err != nil {
-			return duplicates, err
+			return sizemap, err
 		}
 	}
 	if !files.IsDir(source) {
-		return duplicates, fmt.Errorf("%s not a directory", dirpath)
+		return sizemap, fmt.Errorf("%s not a directory", dirpath)
 	}
 	if !quiet && !names {
 		logger.Printf("Looking for duplicates in %s", source)
 	}
 
-	h := &hashes{
-		mutex:    new(sync.Mutex),
-		wg:       new(sync.WaitGroup),
-		registry: make(map[string][]string),
-	}
+	baseDirectory = source
 
 	err = filepath.Walk(source, func(fpath string, f os.FileInfo, err error) error {
 		if !files.IsRegular(fpath) {
 			return nil
 		}
-		fileID, err := filepath.Rel(source, fpath)
-		if err != nil {
-			return err
+
+		s := f.Size()
+		processed = processed + 1
+		dups, ok := sizemap[s]
+
+		if ok {
+			messages <- fpath
+			if len(dups) == 1 {
+				messages <- dups[0]
+			}
 		}
-		fileID = filepath.ToSlash(fileID)
-		if lang.SliceContainsString(excludes, fileID) {
-			return nil
-		}
-		fullPath, err := normalizePath(fpath)
-		if err != nil {
-			return err
-		}
-		fil := file{
-			id:   fileID,
-			path: fullPath,
-		}
-		h.wg.Add(1)
-		go h.save(fil)
+		dups = append(dups, fpath)
+		sizemap[s] = dups
 		return nil
 	})
-	h.wg.Wait()
-	return duplicates, err
+	close(messages)
+	return sizemap, err
 }

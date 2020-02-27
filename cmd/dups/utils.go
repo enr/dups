@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/enr/go-commons/lang"
 )
 
 func trace() {
@@ -27,35 +29,26 @@ func normalizePath(dirpath string) (string, error) {
 }
 
 func printFirstDup(checksum string, fp string) {
-	if !showDups {
-		return
-	}
-	//for _, f := range dups {
 	f := fp
 	if fullPath {
 		f, _ = normalizePath(path.Join(baseDirectory, fp))
 	}
-	if names {
-		logger.Println(f)
-	} else {
-		logger.Printf("%s %s", checksum, f)
-	}
-	//}
+	p(checksum, f)
 }
 
-func printDups(checksum string, fil file) {
-	if !showDups {
-		return
-	}
-	//for _, f := range dups {
+func printDup(checksum string, fil file) {
 	f := fil.id
 	if fullPath {
 		f = fil.path
 	}
+	p(checksum, f)
+}
+
+func p(checksum string, p string) {
 	if names {
-		logger.Println(f)
+		logger.Println(p)
 	} else {
-		logger.Printf("%s %s", checksum, f)
+		logger.Printf("%s %s", checksum, p)
 	}
 	//}
 }
@@ -70,13 +63,14 @@ func humanizeDuration(duration time.Duration) string {
 
 	chunks := []struct {
 		singularName string
+		pluralName   string
 		amount       int64
 	}{
-		{"day", days},
-		{"hour", hours},
-		{"minute", minutes},
-		{"second", seconds},
-		{"millisecond", millis},
+		{"day", "days", days},
+		{"hour", "hours", hours},
+		{"minute", "minutes", minutes},
+		{"second", "seconds", seconds},
+		{"ms", "ms", millis},
 	}
 
 	parts := []string{}
@@ -87,7 +81,7 @@ func humanizeDuration(duration time.Duration) string {
 		case 1:
 			parts = append(parts, fmt.Sprintf("%d %s", chunk.amount, chunk.singularName))
 		default:
-			parts = append(parts, fmt.Sprintf("%d %ss", chunk.amount, chunk.singularName))
+			parts = append(parts, fmt.Sprintf("%d %s", chunk.amount, chunk.pluralName))
 		}
 	}
 
@@ -96,4 +90,31 @@ func humanizeDuration(duration time.Duration) string {
 		return "no time"
 	}
 	return s
+}
+
+func processProbableDuplicate(h *hashes) {
+	for {
+		fpath, ok := <-messages
+		if ok == false {
+			break
+		}
+		fileID, err := filepath.Rel(baseDirectory, fpath)
+		if err != nil {
+			break
+		}
+		fileID = filepath.ToSlash(fileID)
+		if lang.SliceContainsString(excludes, fileID) {
+			break
+		}
+		fullPath, err := normalizePath(fpath)
+		if err != nil {
+			break
+		}
+		fil := file{
+			id:   fileID,
+			path: fullPath,
+		}
+		h.wg.Add(1)
+		h.save(fil)
+	}
 }

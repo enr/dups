@@ -12,8 +12,6 @@ import (
 type hashes struct {
 	mutex *sync.Mutex
 	wg    *sync.WaitGroup
-
-	registry map[string][]string
 }
 
 func (e *hashes) save(f file) {
@@ -21,31 +19,28 @@ func (e *hashes) save(f file) {
 	defer e.mutex.Unlock()
 	defer e.wg.Done()
 
-	processed = processed + 1
 	h, err := hash(f.path)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	dups, ok := e.registry[h]
+	dups, ok := duplicates[h]
 	var first string
-	if len(dups) == 1 {
-		first = dups[0]
-	}
-	dups = append(dups, f.id)
 	if ok {
 		ndups = ndups + 1
-		if !quiet {
+		if len(dups) == 1 {
+			ndups = ndups + 1
+			first = dups[0]
+		}
+		if !quiet && showDups {
 			if first != "" {
-				ndups = ndups + 1
 				printFirstDup(h, first)
 			}
-			printDups(h, f)
+			printDup(h, f)
 		}
 	}
+	dups = append(dups, f.id)
 	duplicates[h] = dups
-
-	e.registry[h] = append(e.registry[h], f.id)
 }
 
 func hash(fullpath string) (string, error) {
