@@ -95,19 +95,27 @@ func humanizeDuration(duration time.Duration) string {
 func processProbableDuplicate(h *hashes) {
 	for {
 		fpath, ok := <-messages
+		if fpath == "" {
+			// channel close
+			break
+		}
 		if ok == false {
+			wg.Done()
 			break
 		}
 		fileID, err := filepath.Rel(baseDirectory, fpath)
 		if err != nil {
+			wg.Done()
 			break
 		}
 		fileID = filepath.ToSlash(fileID)
 		if lang.SliceContainsString(excludes, fileID) {
+			wg.Done()
 			break
 		}
 		fullPath, err := normalizePath(fpath)
 		if err != nil {
+			wg.Done()
 			break
 		}
 		fil := file{
@@ -116,5 +124,6 @@ func processProbableDuplicate(h *hashes) {
 		}
 		h.wg.Add(1)
 		h.save(fil)
+		wg.Done()
 	}
 }

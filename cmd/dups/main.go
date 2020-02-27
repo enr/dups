@@ -36,6 +36,9 @@ Build date: %s
 	names         bool
 	fullPath      bool
 	excludes      []string
+
+	// global wait group counting the probably duplicate files
+	wg sync.WaitGroup
 )
 
 type file struct {
@@ -98,6 +101,7 @@ func main() {
 		fmt.Printf("error %v\n", err)
 		os.Exit(1)
 	}
+	wg.Wait()
 	h.wg.Wait()
 }
 
@@ -123,21 +127,19 @@ func readDirectoryExcluding(dirpath string, excludes []string) (map[int64][]stri
 	if !quiet && !names {
 		logger.Printf("Looking for duplicates in %s", source)
 	}
-
 	baseDirectory = source
-
 	err = filepath.Walk(source, func(fpath string, f os.FileInfo, err error) error {
 		if !files.IsRegular(fpath) {
 			return nil
 		}
-
 		s := f.Size()
 		processed = processed + 1
 		dups, ok := sizemap[s]
-
 		if ok {
+			wg.Add(1)
 			messages <- fpath
 			if len(dups) == 1 {
+				wg.Add(1)
 				messages <- dups[0]
 			}
 		}
