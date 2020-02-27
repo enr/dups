@@ -12,7 +12,7 @@ func TestConventionalToFullSpec(t *testing.T) {
 		CommandExe: "testdata/executable",
 	}
 	spec := toFullSpec(conventional)
-	if !strings.Contains(spec.Command.Exe, "testdata/executable") {
+	if !strings.Contains(spec.Command.Exe, "/qac/testdata/executable") {
 		t.Errorf("Expected command exe containing <testdata/executable> but got <%s>", spec.Command.Exe)
 	}
 }
