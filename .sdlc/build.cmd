@@ -25,5 +25,11 @@ cd %project_dir%
 IF EXIST %exe_path% DEL /F %exe_path%
 
 @echo ON
+SETLOCAL ENABLEDELAYEDEXPANSION
+for /f %%x in ('dir /AD /B /S cmd') do (
+    echo --- go build cmd %%x
+    cd %%x
+    set bin_name=%%~nx
 call go build -mod vendor -ldflags "-s -X %module_name%/lib/core.Version=%APP_VERSION% -X %module_name%/lib/core.BuildTime=%TIMESTAMP% -X %module_name%/lib/core.GitCommit=win-dev-commit" ^
-  -o %exe_path% "%module_name%/cmd/%REPO_NAME%"
+    -o %bin_dir%\!bin_name!.exe "%module_name%/cmd/!bin_name!"
+)
