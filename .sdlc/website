@@ -14,12 +14,14 @@ source "${project_scripts_dir}/config"
     exit 1
 }
 docs_dir="${project_home}/docs"
+[[ -d "$docs_dir" ]] || {
+    echo "Missing docs dir ${docs_dir}"
+    exit 1
+}
 cd "$docs_dir"
 
 website_build_dir="${project_home}/build/website"
 mkdir -p "$website_build_dir"
-
-cp -r "$docs_dir" /documents
 
 # Asciidoctor attributes
 ci_ns="${REPO_OWNER}/${REPO_NAME}"
@@ -31,6 +33,8 @@ asciidoctor --doctype book \
             --attribute "project-version=${APP_VERSION}" \
             --attribute "project-authors=${project_authors}" \
             --attribute "ci-ns=${ci_ns}" \
+            --attribute "repo-owner=${REPO_OWNER}" \
+            --attribute "repo-name=${REPO_NAME}" \
             --attribute "ci-build-id=${ci_build_id}" \
             --destination-dir "$website_build_dir" \
             index.adoc
@@ -39,6 +43,8 @@ asciidoctor-pdf --doctype book \
                 --attribute "project-version=${APP_VERSION}" \
                 --attribute "project-authors=${project_authors}" \
                 --attribute "ci-ns=${ci_ns}" \
+                --attribute "repo-owner=${REPO_OWNER}" \
+                --attribute "repo-name=${REPO_NAME}" \
                 --attribute "ci-build-id=${ci_build_id}" \
                 --destination-dir "${website_build_dir}/pdf" \
                 --out-file="${REPO_NAME}_manual.pdf" \

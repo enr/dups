@@ -1,5 +1,8 @@
 # dups
 
+![CI Linux Mac](https://github.com/enr/dups/workflows/CI%20Linux%20Mac/badge.svg)
+![CI Windows](https://github.com/enr/dups/workflows/CI%20Windows/badge.svg) https://enr.github.io/dups/
+
 Search for duplicate files in a directory.
 
 It doesn't delete them, it's up to you check that the files are actually to remove.
