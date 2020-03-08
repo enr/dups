@@ -1,7 +1,8 @@
 # dups
 
 ![CI Linux Mac](https://github.com/enr/dups/workflows/CI%20Linux%20Mac/badge.svg)
-![CI Windows](https://github.com/enr/dups/workflows/CI%20Windows/badge.svg) https://enr.github.io/dups/
+![CI Windows](https://github.com/enr/dups/workflows/CI%20Windows/badge.svg) 
+https://enr.github.io/dups/
 
 Search for duplicate files in a directory.
 
@@ -9,7 +10,7 @@ It doesn't delete them, it's up to you check that the files are actually to remo
 
 Files are considered dups if having the same hash (`sha1`).
 
-**Usage**
+## Usage
 
 Default report format is `sha1 | relative path`:
 
@@ -48,3 +49,28 @@ $ ./bin/dups --quiet .git/
 $ echo $?
 2
 ```
+
+You can force Dups to set the number of duplicates as exit code using the option `--dups-exit`.
+
+To see more: https://enr.github.io/dups/
+
+
+## Develop
+
+Download or clone repository.
+
+Build (binaries will be created in `bin/`):
+
+```
+./.sdlc/build
+```
+
+Check (code quality and tests);
+
+```
+./.sdlc/check
+```
+
+## License
+
+Copyright (C) 2020 Dups authors.

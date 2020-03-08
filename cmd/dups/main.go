@@ -27,15 +27,16 @@ var (
 Revision: %s
 Build date: %s
 `
-	showDups      = true
-	appVersion    string
-	baseDirectory string
-	version       bool
-	help          bool
-	quiet         bool
-	names         bool
-	fullPath      bool
-	excludes      []string
+	showDups        = true
+	appVersion      string
+	baseDirectory   string
+	version         bool
+	help            bool
+	quiet           bool
+	names           bool
+	fullPath        bool
+	ndupsAsExitCode bool
+	excludes        []string
 
 	// global wait group counting the probably duplicate files
 	wg sync.WaitGroup
@@ -60,7 +61,13 @@ func main() {
 
 	defer func() {
 		trace()
-		os.Exit(ndups)
+		exitCode := 0
+		// exit code is the number of duplicates if quiet=true or
+		// `ndupsAsExitCode` is explicitally set to true
+		if ndupsAsExitCode || quiet {
+			exitCode = ndups
+		}
+		os.Exit(exitCode)
 	}()
 
 	h := &hashes{
@@ -77,6 +84,7 @@ func main() {
 	flag.BoolVar(&help, "help", false, "show help")
 	flag.BoolVar(&names, "names-only", false, "show only file names")
 	flag.BoolVar(&fullPath, "full-path", false, "show full path for files")
+	flag.BoolVar(&ndupsAsExitCode, "dups-exit", false, "set exit code to the number of duplicates")
 	flag.Parse()
 
 	appVersion = fmt.Sprintf(versionTemplate, core.Version, core.GitCommit, core.BuildTime)

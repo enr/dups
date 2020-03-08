@@ -12,7 +12,7 @@ var executions = []commandExecution{
 	{
 		Command: &runcmd.Command{
 			Exe:  "../../bin/dups",
-			Args: []string{"../../testdata/01"},
+			Args: []string{"--dups-exit", "../../testdata/01"},
 		},
 		Success:  false,
 		ExitCode: 2,
@@ -21,7 +21,7 @@ var executions = []commandExecution{
 	{
 		Command: &runcmd.Command{
 			Exe:  "../../bin/dups",
-			Args: []string{"--names-only", "../../testdata/01"},
+			Args: []string{"--dups-exit", "--names-only", "../../testdata/01"},
 		},
 		Success:  false,
 		ExitCode: 2,
