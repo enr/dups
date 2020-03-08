@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path"
@@ -12,10 +13,14 @@ import (
 
 func TestCommandExecution2(t *testing.T) {
 	guarantor := qac.NewGuarantor()
-	for _, spec := range specs {
+	for idx, spec := range specs {
+		s := fmt.Sprintf("QAC errors in spec %d:\n", idx)
 		result := guarantor.VerifyConventional(spec)
 		if len(result.Errors()) > 0 {
-			t.Errorf("QAC errors %v", result.Errors())
+			for _, e := range result.Errors() {
+				s = s + fmt.Sprintf("- %s\n", e.Error())
+			}
+			t.Error(s)
 		}
 	}
 }

@@ -13,8 +13,18 @@ var specs = []qac.ConventionalSpec{
 		CommandArgs: []string{},
 		Success:     false,
 		ExitCode:    1,
-		Stdout: []string{
-			"error missing path",
+		Stderr: []string{
+			"Error: empty search path",
+		},
+	},
+	// error no dir
+	{
+		CommandExe:  "../../bin/dups",
+		CommandArgs: []string{"/this/directory/does/not/exist"},
+		Success:     false,
+		ExitCode:    1,
+		Stderr: []string{
+			"Error reading /this/directory/does/not/exist",
 		},
 	},
 	// version

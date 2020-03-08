@@ -101,12 +101,12 @@ func main() {
 	startTime = time.Now()
 	args := flag.Args()
 	if len(args) < 1 {
-		fmt.Println("error missing path")
+		fmt.Fprintf(os.Stderr, "Error: empty search path")
 		os.Exit(1)
 	}
 	_, err := readDirectory(args[0])
 	if err != nil {
-		fmt.Printf("error %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error reading %s: %v\n", args[0], err)
 		os.Exit(1)
 	}
 	wg.Wait()
