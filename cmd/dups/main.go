@@ -111,14 +111,25 @@ func main() {
 		os.Exit(0)
 	}
 	startTime = time.Now()
+	var startDir string
 	args := pflag.Args()
-	if len(args) < 1 {
-		fmt.Fprintf(os.Stderr, "Error: empty search path")
+	switch len(args) {
+	case 0:
+		wd, err := os.Getwd()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: failed to get current directory: %s\n", err)
+			os.Exit(1)
+		}
+		startDir = wd
+	case 1:
+		startDir = args[0]
+	default:
+		fmt.Fprintf(os.Stderr, "Error: only one path may be supplied\n")
 		os.Exit(1)
 	}
-	_, err := readDirectory(args[0])
+	_, err := readDirectory(startDir)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading %s: %v\n", args[0], err)
+		fmt.Fprintf(os.Stderr, "Error reading %s: %v\n", startDir, err)
 		os.Exit(1)
 	}
 	wg.Wait()
