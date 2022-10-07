@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/enr/dups/lib/core"
 	"github.com/enr/go-files/files"
+	"github.com/spf13/pflag"
 )
 
 var (
@@ -47,6 +47,24 @@ type file struct {
 	path string
 }
 
+func init() {
+
+	pflag.BoolVar(&version, "version", false, "show version")
+	pflag.BoolVarP(&quiet, "quiet", "q", false, "no output, exit code the number of dups")
+	pflag.BoolVarP(&help, "help", "h", false, "show help")
+	pflag.BoolVarP(&names, "names-only", "n", false, "show only file names")
+	pflag.BoolVarP(&fullPath, "full-path", "f", false, "show full path for files")
+	pflag.BoolVarP(&ndupsAsExitCode, "dups-exit", "e", false, "set exit code to the number of duplicates")
+
+	pflag.Usage = func() {
+		fmt.Fprintln(os.Stderr, appVersion)
+		fmt.Fprintln(os.Stderr, "Flags:")
+		pflag.PrintDefaults()
+	}
+
+	appVersion = fmt.Sprintf(versionTemplate, core.Version, core.GitCommit, core.BuildTime)
+}
+
 func main() {
 
 	go func() {
@@ -79,19 +97,10 @@ func main() {
 		processProbableDuplicate(h)
 	}(h)
 
-	flag.BoolVar(&version, "version", false, "show version")
-	flag.BoolVar(&quiet, "quiet", false, "no output, exit code the number of dups")
-	flag.BoolVar(&help, "help", false, "show help")
-	flag.BoolVar(&names, "names-only", false, "show only file names")
-	flag.BoolVar(&fullPath, "full-path", false, "show full path for files")
-	flag.BoolVar(&ndupsAsExitCode, "dups-exit", false, "set exit code to the number of duplicates")
-	flag.Parse()
-
-	appVersion = fmt.Sprintf(versionTemplate, core.Version, core.GitCommit, core.BuildTime)
+	pflag.Parse()
 
 	if help {
-		fmt.Printf(appVersion)
-		flag.PrintDefaults()
+		pflag.Usage()
 		os.Exit(0)
 	}
 	if version {
@@ -99,7 +108,7 @@ func main() {
 		os.Exit(0)
 	}
 	startTime = time.Now()
-	args := flag.Args()
+	args := pflag.Args()
 	if len(args) < 1 {
 		fmt.Fprintf(os.Stderr, "Error: empty search path")
 		os.Exit(1)
