@@ -24,7 +24,7 @@ cd %project_dir%
 for /f %%x in ('dir /AD /B /S lib') do (
     echo --- go test lib %%x
     cd %%x
-    go test -mod vendor -cover ./...
+    go test -cover ./...
 )
 
 cd %project_dir%
@@ -37,7 +37,7 @@ for /f %%x in ('dir /AD /B /S cmd') do (
     echo --- go test cmd %%x
     cd %%x
     set bin_name=%%~nx
-    call go build -mod vendor -ldflags "-s -X %module_name%/lib/core.Version=%APP_VERSION% -X %module_name%/lib/core.BuildTime=%TIMESTAMP% -X %module_name%/lib/core.GitCommit=win-dev-commit" ^
+    call go build -ldflags "-s -X %module_name%/lib/core.Version=%APP_VERSION% -X %module_name%/lib/core.BuildTime=%TIMESTAMP% -X %module_name%/lib/core.GitCommit=win-dev-commit" ^
     -o %bin_dir%\!bin_name!.exe ./...
-    go test -mod vendor -cover ./...
+    go test -cover ./...
 )
