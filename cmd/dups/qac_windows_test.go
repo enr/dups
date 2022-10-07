@@ -8,15 +8,12 @@ import (
 )
 
 var specs = []qac.ConventionalSpec{
-	// error no args
+	// no args
 	{
 		CommandExe:  "../../bin/dups",
 		CommandArgs: []string{},
-		Success:     false,
-		ExitCode:    1,
-		Stderr: []string{
-			"Error: empty search path",
-		},
+		Success:     true,
+		ExitCode:    0,
 	},
 	// error no dir
 	{
