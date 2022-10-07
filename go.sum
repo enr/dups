@@ -1,7 +1,5 @@
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/enr/go-commons v0.0.0-20150504121636-bcd3f40eeea8 h1:AC7CtSxLKKhhYu4Yh483XVpkUWH5k7CWB591TVfNF08=
-github.com/enr/go-commons v0.0.0-20150504121636-bcd3f40eeea8/go.mod h1:JTbFxvBuF28Ocf3xg1sF6nCXtyN6sgx+9qPzSEbAchg=
 github.com/enr/go-files v0.0.0-20170522174406-7336b98a33ba h1:wPRcFp113Qz3A8Z6ulntznw7oY7FYa1iFi3fl1aTgnk=
 github.com/enr/go-files v0.0.0-20170522174406-7336b98a33ba/go.mod h1:QvwX/KsO55tPnw9e92uTlfcHQL4WDte7YzLroozvCBE=
 github.com/enr/runcmd v0.0.0-20150827194601-c7ba37e9c07d h1:Wigkuk/lU7M7l7HIKGnie7q81NcB1HqmYOEx21OdP8o=

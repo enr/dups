@@ -16,6 +16,7 @@ type commandExecution struct {
 }
 
 func verifyExecution(t *testing.T, execution commandExecution) {
+	t.Helper()
 	command := execution.Command
 	res := command.Run()
 	if res.Success() != execution.Success {
@@ -31,12 +32,14 @@ func verifyExecution(t *testing.T, execution commandExecution) {
 }
 
 func verifyExecutions(t *testing.T, executions []commandExecution) {
+	t.Helper()
 	for _, command := range executions {
 		verifyExecution(t, command)
 	}
 }
 
 func assertStringContains(t *testing.T, s string, substr string) {
+	t.Helper()
 	if substr != "" && !strings.Contains(s, substr) {
 		t.Fatalf("expected output\n%s\n  does not contain\n%s\n", s, substr)
 	}
