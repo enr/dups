@@ -1,7 +1,5 @@
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
-github.com/enr/go-commons v0.0.0-20150504121636-bcd3f40eeea8 h1:AC7CtSxLKKhhYu4Yh483XVpkUWH5k7CWB591TVfNF08=
-github.com/enr/go-commons v0.0.0-20150504121636-bcd3f40eeea8/go.mod h1:JTbFxvBuF28Ocf3xg1sF6nCXtyN6sgx+9qPzSEbAchg=
 github.com/enr/go-files v0.3.0 h1:xVzR9Tjxg/HuyERmCojiafeO8qH2737oTBt8JRKC3DE=
 github.com/enr/go-files v0.3.0/go.mod h1:kYv8CX8pWp8qu+fPDek6y19C5Lo2BnD49eLiueAjvgo=
 github.com/enr/runcmd v0.5.0 h1:fllmYqUsafqeAE+wi/z2J1zXjBjc7POV9Zzj89+uZwo=
@@ -11,6 +9,8 @@ github.com/extemporalgenome/slug v0.0.0-20150414033109-0320c85e32e0/go.mod h1:96
 github.com/fzipp/gocyclo v0.0.0-20150627053110-6acd4345c835/go.mod h1:BjL/N0+C+j9uNX+1xcNuM9vdSIcXCZrQZUYbXOFbgN8=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
+github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.7.5 h1:s5PTfem8p8EbKQOctVV53k6jCJt3UX4IEJzwh+C324Q=

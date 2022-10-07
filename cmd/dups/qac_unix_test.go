@@ -11,11 +11,11 @@ var specs = []qac.ConventionalSpec{
 	// error no args
 	{
 		CommandExe:  "../../bin/dups",
-		CommandArgs: []string{},
+		CommandArgs: []string{"dirA", "dirB"},
 		Success:     false,
 		ExitCode:    1,
 		Stderr: []string{
-			"Error: empty search path",
+			"Error: only one path may be supplied",
 		},
 	},
 	// error no dir

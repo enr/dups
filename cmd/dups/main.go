@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/enr/dups/lib/core"
 	"github.com/enr/go-files/files"
+	"github.com/spf13/pflag"
 )
 
 var (
@@ -36,7 +36,8 @@ Build date: %s
 	names           bool
 	fullPath        bool
 	ndupsAsExitCode bool
-	excludes        []string
+	excludes        GlobArray
+	includes        GlobArray
 
 	// global wait group counting the probably duplicate files
 	wg sync.WaitGroup
@@ -45,6 +46,26 @@ Build date: %s
 type file struct {
 	id   string
 	path string
+}
+
+func init() {
+
+	pflag.BoolVar(&version, "version", false, "show version")
+	pflag.BoolVarP(&quiet, "quiet", "q", false, "no output, exit code the number of dups")
+	pflag.BoolVarP(&help, "help", "h", false, "show help")
+	pflag.BoolVarP(&names, "names-only", "n", false, "show only file names")
+	pflag.BoolVarP(&fullPath, "full-path", "f", false, "show full path for files")
+	pflag.BoolVarP(&ndupsAsExitCode, "dups-exit", "E", false, "set exit code to the number of duplicates")
+	pflag.VarP(&excludes, "exclude", "e", "exclude filename glob patterns (can be supplied multiple times)")
+	pflag.VarP(&includes, "include", "i", "only include filename glob patterns (can be supplied multiple times)")
+
+	pflag.Usage = func() {
+		fmt.Fprintln(os.Stderr, appVersion)
+		fmt.Fprintln(os.Stderr, "Flags:")
+		pflag.PrintDefaults()
+	}
+
+	appVersion = fmt.Sprintf(versionTemplate, core.Version, core.GitCommit, core.BuildTime)
 }
 
 func main() {
@@ -79,19 +100,10 @@ func main() {
 		processProbableDuplicate(h)
 	}(h)
 
-	flag.BoolVar(&version, "version", false, "show version")
-	flag.BoolVar(&quiet, "quiet", false, "no output, exit code the number of dups")
-	flag.BoolVar(&help, "help", false, "show help")
-	flag.BoolVar(&names, "names-only", false, "show only file names")
-	flag.BoolVar(&fullPath, "full-path", false, "show full path for files")
-	flag.BoolVar(&ndupsAsExitCode, "dups-exit", false, "set exit code to the number of duplicates")
-	flag.Parse()
-
-	appVersion = fmt.Sprintf(versionTemplate, core.Version, core.GitCommit, core.BuildTime)
+	pflag.Parse()
 
 	if help {
-		fmt.Printf(appVersion)
-		flag.PrintDefaults()
+		pflag.Usage()
 		os.Exit(0)
 	}
 	if version {
@@ -99,14 +111,25 @@ func main() {
 		os.Exit(0)
 	}
 	startTime = time.Now()
-	args := flag.Args()
-	if len(args) < 1 {
-		fmt.Fprintf(os.Stderr, "Error: empty search path")
+	var startDir string
+	args := pflag.Args()
+	switch len(args) {
+	case 0:
+		wd, err := os.Getwd()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: failed to get current directory: %s\n", err)
+			os.Exit(1)
+		}
+		startDir = wd
+	case 1:
+		startDir = args[0]
+	default:
+		fmt.Fprintf(os.Stderr, "Error: only one path may be supplied\n")
 		os.Exit(1)
 	}
-	_, err := readDirectory(args[0])
+	_, err := readDirectory(startDir)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading %s: %v\n", args[0], err)
+		fmt.Fprintf(os.Stderr, "Error reading %s: %v\n", startDir, err)
 		os.Exit(1)
 	}
 	wg.Wait()
@@ -114,16 +137,10 @@ func main() {
 }
 
 func readDirectory(dirpath string) (map[int64][]string, error) {
-	return readDirectoryExcluding(dirpath, excludes)
-}
-
-func readDirectoryExcluding(dirpath string, excludes []string) (map[int64][]string, error) {
 	sizemap := make(map[int64][]string)
-	source, err := normalizePath(dirpath)
-	if err != nil {
-		return sizemap, err
-	}
+	source := filepath.Clean(dirpath)
 	if files.IsSymlink(source) {
+		var err error
 		source, err = os.Readlink(source)
 		if err != nil {
 			return sizemap, err
@@ -136,7 +153,16 @@ func readDirectoryExcluding(dirpath string, excludes []string) (map[int64][]stri
 		logger.Printf("Looking for duplicates in %s", source)
 	}
 	baseDirectory = source
-	err = filepath.Walk(source, func(fpath string, f os.FileInfo, err error) error {
+	err := filepath.Walk(source, func(fpath string, f os.FileInfo, err error) error {
+		if excludes.Match(f.Name()) {
+			return filepath.SkipDir
+		}
+		if len(includes) > 0 {
+			if !includes.Match(f.Name()) {
+				// No SkipDir here, as we might want to include a child path
+				return nil
+			}
+		}
 		if !files.IsRegular(fpath) {
 			return nil
 		}

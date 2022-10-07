@@ -7,8 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/enr/go-commons/lang"
 )
 
 func trace() {
@@ -97,7 +95,6 @@ func processProbableDuplicate(h *hashes) {
 		fpath, ok := <-messages
 		if fpath == "" {
 			// channel close
-			break
 		}
 		if ok == false {
 			wg.Done()
@@ -109,10 +106,6 @@ func processProbableDuplicate(h *hashes) {
 			break
 		}
 		fileID = filepath.ToSlash(fileID)
-		if lang.SliceContainsString(excludes, fileID) {
-			wg.Done()
-			break
-		}
 		fullPath, err := normalizePath(fpath)
 		if err != nil {
 			wg.Done()
