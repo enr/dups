@@ -10,4 +10,3 @@ PRJ_HOME="$( cd -P "$( dirname "$SDLC_DIR" )" && pwd )"
 cd "$PRJ_HOME"
 
 go mod tidy
-go mod vendor
