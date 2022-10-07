@@ -30,6 +30,15 @@ git_credentials_file=$(mktemp)
 git config --global credential.helper "store --file=${git_credentials_file}"
 echo "https://${GITHUB_ACTOR}:${GH_TOKEN}:@github.com" > "$git_credentials_file"
 
+# Fix git safe.directory in container
+[[ -n "$HOME" ]] && {
+  mkdir -p "$HOME"
+  echo "
+[safe]
+    directory = *
+" >> "${HOME}/.gitconfig"
+}
+
 [[ -e "${PRJ_HOME}/build/work" ]] && rm -rf "${PRJ_HOME}/build/work"
 mkdir -p "${PRJ_HOME}/build/work"
 cd "${PRJ_HOME}/build/work"

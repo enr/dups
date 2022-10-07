@@ -39,7 +39,7 @@ var specs = []qac.ConventionalSpec{
 	},
 	{
 		CommandExe:  "../../bin/dups",
-		CommandArgs: []string{"../testdata/01"},
+		CommandArgs: []string{abs("../../testdata/01")},
 		WorkingDir:  "../../bin",
 		Success:     true,
 		ExitCode:    0,
@@ -47,14 +47,14 @@ var specs = []qac.ConventionalSpec{
 	},
 	{
 		CommandExe:  "../../bin/dups",
-		CommandArgs: []string{"--names-only", "../../testdata/01"},
+		CommandArgs: []string{"--names-only", abs("../../testdata/01")},
 		Success:     true,
 		ExitCode:    0,
 		Stdout:      []string{"sub/010.txt"},
 	},
 	{
 		CommandExe:  "../../bin/dups",
-		CommandArgs: []string{"--dups-exit", "../testdata/01"},
+		CommandArgs: []string{"--dups-exit", abs("../../testdata/01")},
 		WorkingDir:  "../../bin",
 		Success:     false,
 		ExitCode:    2,
@@ -62,7 +62,7 @@ var specs = []qac.ConventionalSpec{
 	},
 	{
 		CommandExe:  "../../bin/dups",
-		CommandArgs: []string{"--names-only", "--dups-exit", "../../testdata/01"},
+		CommandArgs: []string{"--names-only", "--dups-exit", abs("../../testdata/01")},
 		Success:     false,
 		ExitCode:    2,
 		Stdout:      []string{"sub/010.txt"},

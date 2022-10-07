@@ -1,6 +1,7 @@
 package main
 
 import (
+	"path/filepath"
 	"testing"
 	"time"
 )
@@ -24,4 +25,12 @@ func TestHumanizeDuration(t *testing.T) {
 			t.Errorf(`duration="%v" got="%s" expected="%s"`, data.duration, actual, data.out)
 		}
 	}
+}
+
+func abs(p string) string {
+	abspath, err := filepath.Abs(p)
+	if err != nil {
+		return filepath.FromSlash(p)
+	}
+	return filepath.FromSlash(abspath)
 }
