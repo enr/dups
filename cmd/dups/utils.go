@@ -95,6 +95,8 @@ func processProbableDuplicate(h *hashes) {
 		fpath, ok := <-messages
 		if fpath == "" {
 			// channel close
+			// break to avoid panic: sync: negative WaitGroup counter
+			break
 		}
 		if ok == false {
 			wg.Done()
