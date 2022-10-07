@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/enr/dups/lib/colorgen"
 	"github.com/enr/dups/lib/core"
 	"github.com/enr/go-files/files"
 	"github.com/spf13/pflag"
@@ -59,6 +60,11 @@ func init() {
 	pflag.VarP(&excludes, "exclude", "e", "exclude filename glob patterns (can be supplied multiple times)")
 	pflag.VarP(&includes, "include", "i", "only include filename glob patterns (can be supplied multiple times)")
 
+	// These flags are automatically read by go-supportscolor
+	// https://github.com/jwalton/go-supportscolor#info
+	pflag.Bool("color", false, "force colored output")
+	pflag.Bool("no-color", false, "disables colored output")
+
 	pflag.Usage = func() {
 		fmt.Fprintln(os.Stderr, appVersion)
 		fmt.Fprintln(os.Stderr, "Flags:")
@@ -94,6 +100,7 @@ func main() {
 	h := &hashes{
 		mutex: new(sync.Mutex),
 		wg:    new(sync.WaitGroup),
+		color: colorgen.NewGenerator(),
 	}
 
 	go func(*hashes) {
