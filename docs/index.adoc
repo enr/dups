@@ -1,7 +1,6 @@
 = Dups
 :author: {project-authors}
 :revnumber: {project-version}
-:source-highlighter: rouge
 
 <<<
 
@@ -12,7 +11,7 @@ image::https://github.com/{ci-ns}/workflows/CI%20Linux%20Mac/badge.svg[CI Linux 
 image::https://github.com/{ci-ns}/workflows/CI%20Windows/badge.svg[CI Windows]
 
 https://github.com/{ci-ns}/releases/latest[Download last artifacts] |
- https://{repo-owner}.github.io/{repo-name}/pdf/{repo-name}_manual.pdf[Pdf manual] |
+ https://{repo-owner}.github.io/{repo-name}/pdf/{repo-name}_manual.pdf[This manual as PDF] |
  Build revision `{ci-build-id}`
 endif::[]
 
@@ -29,7 +28,8 @@ Files are considered dups if having the same hash (at the moment `sha1`).
 
 Default report format is `sha1 | relative path`:
 
-```
+[source,console]
+----
 $ ./bin/dups .git/
 Looking for duplicates in /tmp/dups/.git
 c2c3cf2f0ce489606d88daa5512693a47dbf1cbf logs/HEAD
@@ -37,11 +37,12 @@ c2c3cf2f0ce489606d88daa5512693a47dbf1cbf logs/refs/heads/master
 3d9d5a25a252676fe509e29afbad086d6edb3707 refs/heads/master
 3d9d5a25a252676fe509e29afbad086d6edb3707 refs/remotes/origin/master
 Checked 129 files and found 2 dups in 295ns
-```
+----
 
 You can customize output using `--names-only` or `--full-path`:
 
-```
+[source,console]
+----
 $ ./bin/dups --names-only .git/
 logs/HEAD
 logs/refs/heads/master
@@ -55,15 +56,16 @@ c2c3cf2f0ce489606d88daa5512693a47dbf1cbf /tmp/dups/.git/logs/refs/heads/master
 3d9d5a25a252676fe509e29afbad086d6edb3707 /tmp/dups/.git/refs/heads/master
 3d9d5a25a252676fe509e29afbad086d6edb3707 /tmp/dups/.git/refs/remotes/origin/master
 Checked 129 files and found 2 dups in 230ns
-```
+----
 
 Using `--quiet` option output is suppressed but exit code is the number of duplicates found.
 
-```
+[source,console]
+----
 $ ./bin/dups --quiet .git/
 $ echo $?
 2
-```
+----
 
 You can force Dups to set the number of duplicates as exit code using the option `--dups-exit`.
 
@@ -87,4 +89,5 @@ Check (code quality and tests);
 
 ## License
 
-Copyright (C) 2020 {project-authors}.
+http://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0] - Copyright (C) 2020-TODAY {project-authors}.
+

@@ -12,7 +12,7 @@ jobs:
     #   matrix:
     #     platform: [ubuntu-latest]
     runs-on: ubuntu-latest
-    container: 'asciidoctor/docker-asciidoctor'
+    container: 'asciidoctor/docker-asciidoctor:1.31.0'
     steps:
     - name: Prepare container
       run: |

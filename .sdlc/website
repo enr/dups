@@ -30,6 +30,7 @@ project_authors="${REPO_NAME} contributors"
 echo "Using attributes ci-ns=${ci_ns} ci-build-id=${ci_build_id} project-authors=${project_authors}"
 
 asciidoctor --doctype book \
+            --attribute "source-highlighter=rouge" \
             --attribute "project-version=${APP_VERSION}" \
             --attribute "project-authors=${project_authors}" \
             --attribute "ci-ns=${ci_ns}" \
@@ -40,6 +41,7 @@ asciidoctor --doctype book \
             index.adoc
 
 asciidoctor-pdf --doctype book \
+                --attribute "source-highlighter=rouge" \
                 --attribute "project-version=${APP_VERSION}" \
                 --attribute "project-authors=${project_authors}" \
                 --attribute "ci-ns=${ci_ns}" \
