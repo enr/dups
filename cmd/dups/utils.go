@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/jwalton/gchalk"
 )
 
 func trace() {
@@ -26,29 +28,29 @@ func normalizePath(dirpath string) (string, error) {
 	return p, nil
 }
 
-func printFirstDup(checksum string, fp string) {
+func (e *hashes) printFirstDup(checksum string, fp string) {
 	f := fp
 	if fullPath {
 		f, _ = normalizePath(path.Join(baseDirectory, fp))
 	}
-	p(checksum, f)
+	e.p(checksum, f)
 }
 
-func printDup(checksum string, fil file) {
+func (e *hashes) printDup(checksum string, fil file) {
 	f := fil.id
 	if fullPath {
 		f = fil.path
 	}
-	p(checksum, f)
+	e.p(checksum, f)
 }
 
-func p(checksum string, p string) {
+func (e *hashes) p(checksum string, p string) {
+	colorFn := gchalk.RGB(e.color.GenerateRGB(checksum))
 	if names {
-		logger.Println(p)
+		logger.Println(colorFn(p))
 	} else {
-		logger.Printf("%s %s", checksum, p)
+		logger.Printf("%s %s", colorFn(checksum), p)
 	}
-	//}
 }
 
 // https://gist.github.com/harshavardhana/327e0577c4fed9211f65

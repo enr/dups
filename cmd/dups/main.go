@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/enr/dups/lib/colorgen"
 	"github.com/enr/dups/lib/core"
 	"github.com/enr/go-files/files"
 	"github.com/spf13/pflag"
@@ -94,6 +95,7 @@ func main() {
 	h := &hashes{
 		mutex: new(sync.Mutex),
 		wg:    new(sync.WaitGroup),
+		color: colorgen.NewGenerator(),
 	}
 
 	go func(*hashes) {
