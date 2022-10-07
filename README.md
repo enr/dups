@@ -63,6 +63,8 @@ f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 testdata/01/sub/010.txt
 Checked 4 files and found 2 dups in no time
 ```
 
+To disable output use `--no-color` or the `NO_COLOR` environment variable.
+
 To see more: https://enr.github.io/dups/
 
 

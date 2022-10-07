@@ -7,14 +7,12 @@ import (
 	"log"
 	"os"
 	"sync"
-
-	"github.com/enr/dups/lib/colorgen"
 )
 
 type hashes struct {
 	mutex *sync.Mutex
 	wg    *sync.WaitGroup
-	color *colorgen.Generator
+	rep   *reporter
 }
 
 func (e *hashes) save(f file) {
@@ -37,9 +35,9 @@ func (e *hashes) save(f file) {
 		}
 		if !quiet && showDups {
 			if first != "" {
-				e.printFirstDup(h, first)
+				e.rep.printFirstDup(h, first)
 			}
-			e.printDup(h, f)
+			e.rep.printDup(h, f)
 		}
 	}
 	dups = append(dups, f.id)

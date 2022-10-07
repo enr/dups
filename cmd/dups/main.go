@@ -97,10 +97,13 @@ func main() {
 		os.Exit(exitCode)
 	}()
 
+	rep := &reporter{
+		color: colorgen.NewGenerator(),
+	}
 	h := &hashes{
 		mutex: new(sync.Mutex),
 		wg:    new(sync.WaitGroup),
-		color: colorgen.NewGenerator(),
+		rep:   rep,
 	}
 
 	go func(*hashes) {
