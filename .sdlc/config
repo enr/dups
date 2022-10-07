@@ -2,7 +2,6 @@ REPO_HOST='github.com'
 REPO_OWNER='enr'
 REPO_NAME='dups'
 DIST_DIR='dist'
-GOPROXY='off'
 
 APP_VERSION='0.5.0-dev-dev' # APP_VERSION_AUTOLINE this line is automatically managed
 
