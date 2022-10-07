@@ -14,7 +14,7 @@ Files are considered dups if having the same hash (`sha1`).
 
 Default report format is `sha1 | relative path`:
 
-```
+```console
 $ ./bin/dups .git/
 Looking for duplicates in /tmp/dups/.git
 c2c3cf2f0ce489606d88daa5512693a47dbf1cbf logs/HEAD
@@ -26,7 +26,7 @@ Checked 129 files and found 2 dups in 295ns
 
 You can customize output using `--names-only` or `--full-path`:
 
-```
+```console
 $ ./bin/dups --names-only .git/
 logs/HEAD
 logs/refs/heads/master
@@ -44,7 +44,7 @@ Checked 129 files and found 2 dups in 230ns
 
 Using `--quiet` option output is suppressed but exit code is the number of duplicates found.
 
-```
+```console
 $ ./bin/dups --quiet .git/
 $ echo $?
 2
@@ -70,15 +70,17 @@ To see more: https://enr.github.io/dups/
 
 Download or clone repository.
 
+Requires Go 1.19 (or higher).
+
 Build (binaries will be created in `bin/`):
 
-```
+```sh
 ./.sdlc/build
 ```
 
 Check (code quality and tests);
 
-```
+```sh
 ./.sdlc/check
 ```
 

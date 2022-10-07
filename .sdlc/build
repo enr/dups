@@ -35,7 +35,7 @@ echo "git message ${git_message}"
 for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
   app_name=$(basename "$dir")
   echo "===  Process ${app_name} ${dir}"
-  go build -mod vendor -ldflags "-s \
+  go build -ldflags "-s \
   -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.Version=${APP_VERSION} \
   -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.BuildTime=${buildtime} \
   -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.GitCommit=${git_commit}" \

@@ -52,7 +52,7 @@ for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
     ext=''
     [[ "windows" = "$target_goos" ]] && ext='.exe'
     built="${PRJ_HOME}/bin/${app_name}-${target_goos}-${target_goarch}${ext}"
-    GOOS="$target_goos" GOARCH="$target_goarch" go build -mod vendor -ldflags "-s \
+    GOOS="$target_goos" GOARCH="$target_goarch" go build -ldflags "-s \
     -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.Version=${APP_VERSION} \
     -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.BuildTime=${buildtime} \
     -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.GitCommit=${git_commit}" \

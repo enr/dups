@@ -3,6 +3,4 @@ set REPO_OWNER=enr
 set REPO_NAME=dups
 set TIMESTAMP=win-dev-timestamp
 
-set GOPROXY='off'
-
 set APP_VERSION=win-dev

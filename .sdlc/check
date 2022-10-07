@@ -42,15 +42,15 @@ echo "Environment PATH=${PATH}"
 }
 
 hash golint 2>/dev/null || {
-  go get -u golang.org/x/lint/golint
+  go install golang.org/x/lint/golint@latest
 }
 
 hash goimports 2>/dev/null || {
-  go get -u golang.org/x/tools/cmd/goimports
+  go install golang.org/x/tools/cmd/goimports@latest
 }
 
 hash gocyclo 2>/dev/null || {
-  go get -u github.com/fzipp/gocyclo
+  go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
 }
 
 cd "${PRJ_HOME}"
@@ -74,7 +74,7 @@ for dir in $(find "$LIB_DIR" -mindepth 1 -maxdepth 1 -type d); do
   # echo "--- go build"
   cd "$dir"
   echo "--- go test -cover ./..."
-  go test -mod vendor -cover ./...
+  go test -cover ./...
 done
 
 for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
@@ -95,8 +95,8 @@ for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
   cd "${PRJ_HOME}"
   echo "--- go build"
   # we need binaries for some e2e test
-  go build -mod vendor -o "${BIN_DIR}/${app_name}" "${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/cmd/${app_name}"
+  go build -o "${BIN_DIR}/${app_name}" "${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/cmd/${app_name}"
   cd "$dir"
   echo "--- go test -cover ./..."
-  go test -mod vendor -cover ./...
+  go test -cover ./...
 done
