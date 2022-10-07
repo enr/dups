@@ -32,8 +32,8 @@ var executions = []commandExecution{
 			Exe:  "../../bin/dups",
 			Args: []string{},
 		},
-		Success:  false,
-		ExitCode: 1,
+		Success:  true,
+		ExitCode: 0,
 	},
 }
 
