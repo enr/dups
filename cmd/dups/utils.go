@@ -72,7 +72,7 @@ func processProbableDuplicate(h *hashes) {
 			// break to avoid panic: sync: negative WaitGroup counter
 			break
 		}
-		if ok == false {
+		if !ok {
 			wg.Done()
 			break
 		}

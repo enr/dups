@@ -46,10 +46,10 @@ func (e *hashes) save(f file) {
 
 func hash(fullpath string) (string, error) {
 	fh, err := os.Open(fullpath)
-	defer fh.Close()
 	if err != nil {
 		return "", err
 	}
+	defer fh.Close()
 	h := sha1.New()
 	io.Copy(h, fh)
 	return fmt.Sprintf("%x", h.Sum(nil)), nil
