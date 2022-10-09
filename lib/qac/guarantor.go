@@ -2,7 +2,7 @@ package qac
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -54,7 +54,7 @@ func verifyStatusExpectation(expectation StatusExpectation, ser *SpecExecutionRe
 
 func verifyOutputExpectation(expectation OutputExpectation, ser *SpecExecutionResult, out string, desc string) {
 	if expectation.File != "" {
-		content, err := ioutil.ReadFile(expectation.File)
+		content, err := os.ReadFile(expectation.File)
 		if err != nil {
 			ser.addError(err)
 			return
