@@ -2,15 +2,8 @@ name: Create Website
 
 on:
   push:
-    branches:
-      - master
-    tags-ignore:
-      - '*'
-# on:
-#   push:
-#     tags:
-#       - 'v*'
-
+    tags:
+      - 'v*'
 
 jobs:
   build:
