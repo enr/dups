@@ -3,5 +3,5 @@ REPO_OWNER='enr'
 REPO_NAME='dups'
 DIST_DIR='dist'
 
-APP_VERSION='0.6.0-dev' # APP_VERSION_AUTOLINE this line is automatically managed
+APP_VERSION='0.6.0' # APP_VERSION_AUTOLINE this line is automatically managed
 
