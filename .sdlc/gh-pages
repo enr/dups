@@ -21,6 +21,17 @@ sh -c "${SDLC_DIR}/website"
 
 echo "Publishing GH pages"
 
+# Fix git safe.directory in container
+[[ -n "$HOME" ]] && {
+  mkdir -p "$HOME"
+  echo "
+[safe]
+    directory = *
+" >> "${HOME}/.gitconfig"
+echo " Written ${HOME}/.gitconfig"
+cat "${HOME}/.gitconfig"
+}
+
 commit_user=$(git show -s --format='%an' "$GITHUB_SHA")
 commit_email=$(git show -s --format='%ae' "$GITHUB_SHA")
 echo "Using ${commit_user} / ${commit_email} ${GITHUB_SHA}"
@@ -30,14 +41,6 @@ git_credentials_file=$(mktemp)
 git config --global credential.helper "store --file=${git_credentials_file}"
 echo "https://${GITHUB_ACTOR}:${GH_TOKEN}:@github.com" > "$git_credentials_file"
 
-# Fix git safe.directory in container
-[[ -n "$HOME" ]] && {
-  mkdir -p "$HOME"
-  echo "
-[safe]
-    directory = *
-" >> "${HOME}/.gitconfig"
-}
 
 [[ -e "${PRJ_HOME}/build/work" ]] && rm -rf "${PRJ_HOME}/build/work"
 mkdir -p "${PRJ_HOME}/build/work"

@@ -1,10 +1,16 @@
+name: Create Website
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - master
+    tags-ignore:
+      - '*'
+# on:
+#   push:
+#     tags:
+#       - 'v*'
 
-name: Create Website
 
 jobs:
   build:
