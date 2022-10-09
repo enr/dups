@@ -657,7 +657,7 @@ pre.rouge {
 <h1>Dups</h1>
 <div class="details">
 <span id="author" class="author">dups contributors</span><br>
-<span id="revnumber">version 0.7.0-dev</span>
+<span id="revnumber">version 0.6.1</span>
 </div>
 </div>
 <div id="content">
@@ -677,7 +677,7 @@ pre.rouge {
 <div class="paragraph">
 <p><a href="https://github.com/enr/dups/releases/latest">Download last artifacts</a> |
  <a href="https://enr.github.io/dups/pdf/dups_manual.pdf">This manual as PDF</a> |
- Build revision <code>ad9715f2bbebf0bd6840bf933cbe48f1f33cf845</code></p>
+ Build revision <code>84f00e7c9421e57f7cf93defccc33f6dbf8d75dc</code></p>
 </div>
 </div>
 </div>
@@ -743,6 +743,22 @@ Checked 129 files and found 2 dups in 230ns</span></code></pre>
 <div class="paragraph">
 <p>You can force Dups to set the number of duplicates as exit code using the option <code>--dups-exit</code>.</p>
 </div>
+<div class="paragraph">
+<p>You can exclude certain files or directories using <code>--exclude</code> and only include certain <strong>filenames</strong> using <code>--include</code>.
+Both flags supports patterns, e.g <code>--include '*.txt'</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="console"><span class="gp">$</span><span class="w"> </span>./bin/dups <span class="nb">.</span> <span class="nt">--exclude</span> .git <span class="nt">--include</span> <span class="s1">'*.txt'</span>
+<span class="go">Looking for duplicates in .
+f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 testdata/01/01.txt
+f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 testdata/01/sub/010.txt
+Checked 4 files and found 2 dups in no time</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To disable output colors use <code>--no-color</code> or the <code>NO_COLOR</code> environment variable.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -780,8 +796,8 @@ Checked 129 files and found 2 dups in 230ns</span></code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.7.0-dev<br>
-Last updated 2022-10-09 20:27:11 UTC
+Version 0.6.1<br>
+Last updated 2022-10-09 20:33:16 UTC
 </div>
 </div>
 </body>
