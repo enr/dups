@@ -31,6 +31,33 @@ var executions = []commandExecution{
 	{
 		Command: &runcmd.Command{
 			Exe:  "../../bin/dups",
+			Args: []string{"--dups-exit", abs("../../testdata/02")},
+		},
+		Success:  false,
+		ExitCode: 6,
+		Stdout:   "5619cedcdc1d07a16eb2cb8f132ecdd08e1d699a exc/b2",
+	},
+	{
+		Command: &runcmd.Command{
+			Exe:  "../../bin/dups",
+			Args: []string{"--dups-exit", "--include", "f*", abs("../../testdata/02")},
+		},
+		Success:  false,
+		ExitCode: 4,
+		Stdout:   "e630d1f8dd29477ad933ee8355f9b9712bcb8fe4 inc/f2",
+	},
+	{
+		Command: &runcmd.Command{
+			Exe:  "../../bin/dups",
+			Args: []string{"--dups-exit", "--exclude", "exc", abs("../../testdata/02")},
+		},
+		Success:  false,
+		ExitCode: 3,
+		Stdout:   "e630d1f8dd29477ad933ee8355f9b9712bcb8fe4 inc/f3",
+	},
+	{
+		Command: &runcmd.Command{
+			Exe:  "../../bin/dups",
 			Args: []string{},
 		},
 		Success:  true,
