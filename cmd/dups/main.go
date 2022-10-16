@@ -117,7 +117,7 @@ func main() {
 		os.Exit(0)
 	}
 	if version {
-		fmt.Printf(appVersion)
+		fmt.Print(appVersion)
 		os.Exit(0)
 	}
 	startTime = time.Now()

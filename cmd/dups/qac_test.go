@@ -2,10 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
-	"path"
-	"path/filepath"
 	"testing"
 
 	"github.com/enr/dups/lib/qac"
@@ -23,12 +19,4 @@ func TestCommandExecution2(t *testing.T) {
 			t.Error(s)
 		}
 	}
-}
-
-func cwd(f string) string {
-	dir, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return filepath.ToSlash(path.Join(dir, f))
 }
