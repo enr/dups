@@ -1,6 +1,7 @@
 = Dups
 :author: {project-authors}
 :revnumber: {project-version}
+:stylesheet: style.css
 
 <<<
 

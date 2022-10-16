@@ -64,6 +64,7 @@ echo "Release ${PRJ_HOME} version ${RELEASE_VERSION} ${PRERELEASE}"
 
 "${SDLC_DIR}/build-dist"
 
+DIST_DIR="${PRJ_HOME}/${SDLC_DIST_DIR}"
 [[ -z "$DIST_DIR" ]] && {
   echo "dist directory not found: ${DIST_DIR}"
   exit 1

@@ -2,11 +2,37 @@
 
 set -e
 
-TOOL_SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$TOOL_SOURCE" ] ; do TOOL_SOURCE="$(readlink "$TOOL_SOURCE")"; done
-SDLC_DIR="$( cd -P "$( dirname "$TOOL_SOURCE" )" && pwd )"
-PRJ_HOME="$( cd -P "$( dirname "$SDLC_DIR" )" && pwd )"
+tool_source="${BASH_SOURCE[0]}"
+while [ -L "$tool_source" ] ; do tool_source="$(readlink "$tool_source")"; done
+sdlc_dir="$( cd -P "$( dirname "$tool_source" )" && pwd )"
+prj_home="$( cd -P "$( dirname "$sdlc_dir" )" && pwd )"
 
-cd "$PRJ_HOME"
+source "${sdlc_dir}/config"
+
+echo "Project home ${prj_home}"
+lib_dir="${prj_home}/lib"
+cmd_dir="${prj_home}/cmd"
+
+cd "$prj_home"
+
+for dir in $(find "$lib_dir" -mindepth 1 -maxdepth 1 -type d); do
+  app_name=$(basename "$dir")
+  echo "===  Update dependencies for lib ${app_name} [${dir}]"
+  cd "$dir"
+  go get -u
+done
+
+for dir in $(find "$cmd_dir" -mindepth 1 -maxdepth 1 -type d); do
+  app_name=$(basename "$dir")
+  echo "===  Update dependencies for cmd ${app_name} [${dir}]"
+  cd "$dir"
+  go get -u
+done
+
+cd "$prj_home"
 
 go mod tidy
+
+[[ -n "$SDLC_GO_VENDOR" ]] && {
+  go mod vendor
+}

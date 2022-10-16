@@ -7,9 +7,6 @@ on:
 
 jobs:
   build:
-    # strategy:
-    #   matrix:
-    #     platform: [ubuntu-latest]
     runs-on: ubuntu-latest
     container: 'asciidoctor/docker-asciidoctor:1.31.0'
     steps:

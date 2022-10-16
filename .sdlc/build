@@ -25,17 +25,17 @@ echo "version : ${APP_VERSION}"
 echo "git : ${git_commit}"
 echo "build time : ${buildtime}"
 
-git_message=$(git log --format=%B -n 1 "${git_hash}")
-echo "git message ${git_message}"
-[[ "$git_message" == '[skip ci]'* ]] && {
-  echo "skip ci"
-  exit 0
+buildmode='readonly'
+[[ -n "$SDLC_GO_VENDOR" ]] && {
+  export GOPROXY='off'
+  buildmode='vendor'
+  echo "Detected Go vendor mode: set GOPROXY=off and buildmode ${buildmode}"
 }
 
 for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
   app_name=$(basename "$dir")
   echo "===  Process ${app_name} ${dir}"
-  go build -ldflags "-s \
+  go build -mod "$buildmode" -ldflags "-s \
   -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.Version=${APP_VERSION} \
   -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.BuildTime=${buildtime} \
   -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.GitCommit=${git_commit}" \

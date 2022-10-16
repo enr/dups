@@ -8,7 +8,7 @@ SDLC_DIR="$( cd -P "$( dirname "$TOOL_SOURCE" )" && pwd )"
 PRJ_HOME="$( cd -P "$( dirname "$SDLC_DIR" )" && pwd )"
 
 source "${SDLC_DIR}/config"
-DIST_DIR="${PRJ_HOME}/${DIST_DIR}"
+dist_dir="${PRJ_HOME}/${SDLC_DIST_DIR}"
 CMDS_DIR="${PRJ_HOME}/cmd"
 
 buildtime=$(TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ')
@@ -22,7 +22,7 @@ echo "version : ${APP_VERSION}"
 echo "git : ${git_commit}"
 echo "build time : ${buildtime}"
 
-[[ -z "$DIST_DIR" ]] && {
+[[ -z "$dist_dir" ]] && {
   echo "no dist dir set"
   exit 1
 }
@@ -33,8 +33,15 @@ hash zip 2>/dev/null || {
 }
 
 [[ -d "${PRJ_HOME}/bin" ]] && rm -r "${PRJ_HOME}/bin"
-[[ -d "$DIST_DIR" ]] && rm -r "$DIST_DIR"
-mkdir -p "$DIST_DIR"
+[[ -d "$dist_dir" ]] && rm -r "$dist_dir"
+mkdir -p "$dist_dir"
+
+buildmode='readonly'
+[[ -n "$SDLC_GO_VENDOR" ]] && {
+  export GOPROXY='off'
+  buildmode='vendor'
+  echo "Detected Go vendor mode: set GOPROXY=off and buildmode ${buildmode}"
+}
 
 platforms="windows/amd64 linux/amd64 darwin/amd64"
 
@@ -47,12 +54,12 @@ for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
     target_goarch=$(echo $platform | cut -d/ -f2)
     echo "building for ${target_goos} ${target_goarch}"
     platform_dist_basename="${REPO_NAME}-${APP_VERSION}_${target_goos}_${target_goarch}"
-    platform_dist_dir="${DIST_DIR}/${platform_dist_basename}"
+    platform_dist_dir="${dist_dir}/${platform_dist_basename}"
     mkdir -p "$platform_dist_dir"
     ext=''
     [[ "windows" = "$target_goos" ]] && ext='.exe'
     built="${PRJ_HOME}/bin/${app_name}-${target_goos}-${target_goarch}${ext}"
-    GOOS="$target_goos" GOARCH="$target_goarch" go build -ldflags "-s \
+    GOOS="$target_goos" GOARCH="$target_goarch" go build -mod "$buildmode" -ldflags "-s \
     -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.Version=${APP_VERSION} \
     -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.BuildTime=${buildtime} \
     -X ${REPO_HOST}/${REPO_OWNER}/${REPO_NAME}/lib/core.GitCommit=${git_commit}" \
@@ -66,8 +73,8 @@ for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
   done
 done
 
-cd "$DIST_DIR"
-for dir in $(find "$DIST_DIR" -mindepth 1 -maxdepth 1 -type d); do
+cd "$dist_dir"
+for dir in $(find "$dist_dir" -mindepth 1 -maxdepth 1 -type d); do
   dist_folder=$(basename "$dir")
   echo "===  Create dist ${dist_folder} ${dir}"
   zip -r "${dist_folder}.zip" "$dist_folder"

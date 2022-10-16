@@ -1,4 +1,7 @@
-bin/
-pkg/
-dist/
+/bin/
+/pkg/
+/dist/
+/build/
+/tmp/
+*.bak
 

@@ -10,26 +10,38 @@ call config.bat
 cd ..
 set project_dir=%cd%
 
+set bin_dir=%project_dir%\bin
+
 set module_name=%REPO_HOST%/%REPO_OWNER%/%REPO_NAME%
-set exe_path=bin\%REPO_NAME%.exe
 
 echo script_name   %script_name%
 echo script_path   %script_path%
 echo script_dir    %script_dir%
 echo project_dir   %project_dir%
 echo module_name   %module_name%
-echo exe_path      %exe_path%
+echo bin_dir       %bin_dir%
 
 cd %project_dir%
 
-IF EXIST %exe_path% DEL /F %exe_path%
+set buildmode=readonly
+IF DEFINED SDLC_GO_VENDOR (
+    echo Using Go vendor
+    set GOPROXY=off
+    set buildmode=vendor
+)
 
-@echo ON
 SETLOCAL ENABLEDELAYEDEXPANSION
 for /f %%x in ('dir /AD /B /S cmd') do (
     echo --- go build cmd %%x
     cd %%x
     set bin_name=%%~nx
-call go build -ldflags "-s -X %module_name%/lib/core.Version=%APP_VERSION% -X %module_name%/lib/core.BuildTime=%TIMESTAMP% -X %module_name%/lib/core.GitCommit=win-dev-commit" ^
-    -o %bin_dir%\!bin_name!.exe "%module_name%/cmd/!bin_name!"
+    set exe_path=%bin_dir%\!bin_name!.exe
+    echo Build %module_name% cmd !bin_name! into !exe_path!
+    IF EXIST !exe_path! (
+        echo Deleting old bin !exe_path!
+        DEL /F !exe_path!
+    )
+    call go build -mod %buildmode%  ^
+         -ldflags "-s -X %module_name%/lib/core.Version=%APP_VERSION% -X %module_name%/lib/core.BuildTime=%TIMESTAMP% -X %module_name%/lib/core.GitCommit=win-dev-commit" ^
+         -o !exe_path! "%module_name%/cmd/!bin_name!"
 )

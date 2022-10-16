@@ -1,7 +1,6 @@
 REPO_HOST='github.com'
 REPO_OWNER='enr'
 REPO_NAME='dups'
-DIST_DIR='dist'
+SDLC_DIST_DIR='dist'
 
 APP_VERSION='0.7.0-dev' # APP_VERSION_AUTOLINE this line is automatically managed
-
