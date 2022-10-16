@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 TOOL_SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$TOOL_SOURCE" ]; do TOOL_SOURCE="$(readlink "$TOOL_SOURCE")"; done
@@ -106,7 +106,7 @@ for dir in $(find "$CMDS_DIR" -mindepth 1 -maxdepth 1 -type d); do
 done
 
 cd "${PRJ_HOME}"
-[[ -n "${SDLC_E2E_DIR}" ]] && {
+[[ -z "${SDLC_E2E_DIR}" ]] || {
   e2e_dir="${PRJ_HOME}/${SDLC_E2E_DIR}"
   [[ -d "$e2e_dir" ]] && {
     echo "Running E2E tests in ${e2e_dir}"
